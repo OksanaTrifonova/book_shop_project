@@ -12,7 +12,6 @@
     DROP TABLE IF EXISTS item;
     DROP TABLE IF EXISTS order_item;
 
-
     CREATE TABLE  app_user
     (
       id INT NOT NULL AUTO_INCREMENT,
