@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+  <title>Login</title>
+    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="style-footer.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 300px;
+      margin: 100px auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .error {
+      color: red;
+      margin-top: 5px;
+    }
+    .text-center {
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+<div th:insert="header.html :: header"></div>
+
+<div class="container">
+    <div th:if="${message}" class="alert alert-warning">
+        <p th:text="${message}"></p>
+    </div>
+  <h2 class="text-center">Log in to your account</h2><br>
+  <form action="/login" method="post">
+<!--    error massage-->
+    <div th:if="${param.error}">
+      <div class="alert alert-danger"> Invalid username or password.</div>
+    </div>
+<!--    logout message-->
+    <div th:if="${param.logout}">
+      <div class="alert alert-info">  You have been logged out.</div>
+    </div>
+    <input type="email" name="username" placeholder="E-mail address"><br>
+    <input type="password" name="password" placeholder="Password"><br>
+<!--      <input type="hidden" name="_csrf" value="${_csrf.token}">-->
+    <button type="submit">Log in</button>
+    <div class="text-center">
+      <p><a href="login/register">Create an account</a></p>
+    </div>
+  </form>
+</div>
+
+<div th:insert="footer.html :: footer"></div>
+
+</body>
+</html>

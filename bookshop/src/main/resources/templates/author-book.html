@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Author Books</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h3 {
+      color: #333;
+       text-align: center;
+    }
+    .books-table {
+      width: 50%;
+      margin: 20px auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .book-image {
+      width: 60px;
+      height: 100px;
+    }
+    .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+  </style>
+</head>
+<body>
+<h3>Books by <span th:text="${author.name}"></span></h3>
+<div class="books-table">
+  <table>
+
+    <tr th:each="book : ${books}">
+      <h4>
+        <a th:href="@{'/book/' + ${book.id}}">
+          <span th:text="${book.title}"></span>
+        </a>
+        <p th:text="${book.category}"></p>
+      </h4>
+      <img th:src="@{/images/{id}(id=${book.imageId})}" alt="Book Image" class="book-image" src="">
+    </tr>
+
+  </table>
+</div>
+<a href="/authors" class="back-link">Back to authors</a>
+</body>
+</html>

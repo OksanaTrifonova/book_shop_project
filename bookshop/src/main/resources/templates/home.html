@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>Bookstore</title>
+    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="style-footer.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('books.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        section {
+            padding: 20px;
+            text-align: center;
+        }
+
+
+        .basket-icon {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .basket-icon:hover::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #FF0000;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="header.html :: header"></div>
+<section>
+    <h2>FIND YOUR BOOK!</h2>
+    <p>You can explore our store if you're looking for a wide variety of books that cater to all genres and interests. From bestsellers to hidden gems,
+        we have something for everyone.</p>
+</section>
+<div th:insert="footer.html :: footer"></div>
+
+</body>
+</html>

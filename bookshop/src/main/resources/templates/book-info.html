@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color:  #808080;
+            color: #fff;
+            padding: 10px;
+        }
+
+        nav {
+            background-color:  #808080;
+            padding: 10px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        nav ul li a {
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 5px;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 80px; /* Add margin at the bottom */
+            padding-top: 25px;
+            display: grid;
+        }
+
+        .alert-info {
+            background-color: #d4e3fc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .book-info {
+            display: flex;
+            align-items: flex-start;
+            overflow: hidden;
+        }
+
+        .book-image {
+            height: 280px;
+            width: 180px;
+            margin-right: 20px;
+        }
+
+        .book-details {
+            flex-grow: 1;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #000080;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 120px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .top-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            background-color:  #808080;
+            color: #fff;
+            padding: 5px;
+            text-align: center;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        .btn1-container-change {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+}
+    .btn-edit, .btn-delete {
+    background-color: gray;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 90px;
+}
+    </style>
+</head>
+<body>
+<div th:insert="header.html :: header"></div>
+<div class="container mt-5">
+    <div th:if="${book.active}" th:each="book: ${book}" class="alert-info mt-2 book-info">
+        <img th:src="@{/images/{id}(id=${book.imageId})}" alt="Book Image" class="book-image">
+
+        <div class="book-details">
+            <p th:text="${book.title}"></p>
+            <p th:text="'$'+ ${book.price}"></p>
+            <p th:text="${book.description}"></p><br><br>
+            <p th:text="${book.category}"></p>
+            <p>Author(s):
+                <span th:each="authorName, iterStat : ${book.authorNames}">
+                        <span th:text="${authorName}"></span>
+                        <span th:if="${!iterStat.last}">, </span>
+                    </span>
+            </p>
+
+                <div sec:authorize="!hasRole('ADMIN') and !hasRole('MANAGER')" class="btn-container">
+                    <a th:href="'/book/'+${book.id}+'/cart'" class="btn btn-warning">Add to cart</a><br>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div th:unless="${book.active}" class="alert-danger mt-2">
+            <p>This book is currently not available in the bookstore.</p>
+            <img th:src="@{/images/{id}(id=${book.imageId})}" alt="Book Image" class="book-image" src="">
+            <p>Title: <span th:text="${book.title}"></span></p>
+            <p>Category: <span th:text="${book.category}"></span></p>
+            <p>Author(s):
+                <span th:each="authorName, iterStat : ${book.authorNames}">
+                        <span th:text="${authorName}"></span>
+                        <span th:if="${!iterStat.last}">, </span>
+                    </span>
+            </p>
+            <div sec:authorize="hasRole('ADMIN') or hasRole('MANAGER')" class="btn1-container-change">
+                <form th:action="'/book/'+${book.id}+'/active'" method="post">
+                    <button class="btn btn-warning" type="submit">Add to shop</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div sec:authorize="hasRole('ADMIN') or hasRole('MANAGER')" class="btn1-container-change">
+        <a th:href="'/book/'+${book.id}+'/edit'" class="btn btn-edit">Edit</a>
+        <form th:action="'/book/'+${book.id}+'/remove'" method="post">
+            <button class="btn btn-delete" type="submit">Delete</button>
+        </form>
+    </div>
+
+
+    <div th:insert="footer.html :: footer"></div>
+    </body>
+    </html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Registered Users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            margin: 20px auto;
+            width: 80%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+         .add-user-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+         .delete-button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .form-group{
+        margin-bottom: 10px;
+        }
+        .form-group label{
+        display: block;
+        margin-bottom: 5px;
+        }
+         .btn-success {
+        background-color: green;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row col-md-10">
+        <h2>List of registered users</h2>
+    </div>
+    <table>
+        <thead>
+        <thead>
+    <tr>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Email</th>
+<!--        <th>Address</th>-->
+<!--        <th>Phone number</th>-->
+        <th>Role</th>
+        <th>Order history</th>
+        <th sec:authorize="hasRole('ADMIN')" class="top-right">Delete user</th>
+
+    </tr>
+    </thead>
+
+        <tbody>
+        <tr th:each="user : ${users}" class="alert-info mt-2">
+            <td th:text="${user.firstName}"></td>
+            <td th:text="${user.lastName}"></td>
+            <td th:text="${user.email}"></td>
+            <td>
+                <form action="/users/set-role" method="post">
+                    <input type="hidden" name="userId" th:value="${user.id}">
+
+                    <span th:text="${user.role}"></span>
+                    <select sec:authorize="hasRole('ADMIN')" class="top-right" name="role">
+                        <option value="USER" th:selected="${user.role == 'USER'}" th:if="${user.role != null}">User</option>
+                        <option value="ADMIN" th:selected="${user.role == 'ADMIN'}" th:if="${user.role != null}">Admin</option>
+                        <option value="MANAGER" th:selected="${user.role == 'MANAGER'}" th:if="${user.role != null}">Manager</option>
+                    </select>
+                    <button sec:authorize="hasRole('ADMIN')" class="top-right" type="submit">Save</button>
+                </form>
+            </td>
+
+            <td><a th:href="@{'/user/' + ${user.id}+'/orders'}">Orders</a></td>
+            <td>
+                <form sec:authorize="hasRole('ADMIN')" class="top-right" th:action="@{/user/delete/{id}(id=${user.id})}" th:object="${user}" method="post">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form></td>
+        </tbody>
+    </table>
+<div class="top-right">
+    <a href="/user/add" class="add-user-link">Add new user</a><br>
+    <a  sec:authorize="hasRole('ADMIN')" href="/admin" class="back-link">Back to Admin Panel</a></div>
+    <div sec:authorize="hasRole('MANAGER')" class="top-right">
+        <a href="/manager" class="back-link">Back to Manager Panel</a>
+    </div>
+</div>
+</body>
+</html>

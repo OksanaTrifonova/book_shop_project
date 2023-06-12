@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit</title>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 300px;
+            margin: 100px auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+         .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+  <div class="container mt-5">
+    <h1>Edit a book</h1>
+    <form th:object="${book}" method="post" th:action="@{/book/{id}/edit(id=${book.id})}" enctype="multipart/form-data">
+
+    <input type="text" th:value="${book.title}" name="title" placeholder="Add book title" class="form-control"
+           value="${book.title}" required oninvalid="this.setCustomValidity('Title is required')" oninput="this.setCustomValidity('')"><br>
+      <div class="form-group">
+        <label for="authors">Authors:</label>
+        <select id="authors" name="authorIds[]" multiple
+                required oninvalid="this.setCustomValidity('At least one author must be selected')" oninput="this.setCustomValidity('')">
+          <option value="">Select author(s)</option>
+          <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
+        </select><br><br>
+
+      </div>
+      <input type="text" th:value="${book.price}" name="price" placeholder="Add book price" class="form-control"
+             required oninvalid="this.setCustomValidity('Price is required')" oninput="this.setCustomValidity('')"
+             title="Invalid price format. Please enter a valid decimal number"><br>
+      <input type="text" th:value="${book.description}" name="description" placeholder="Add book description" class="form-control"
+             required oninvalid="this.setCustomValidity('Description is required')" oninput="this.setCustomValidity('')"><br>
+      <input type="file" name="imageFile" accept="image/*"
+             required oninvalid="this.setCustomValidity('File is required')" oninput="this.setCustomValidity('')"/><br><br>
+      <div class="form-group">
+        <label for="category">Category:</label>
+        <select id="category" name="category" required>
+          <option value="DETECTIVE">Detective</option>
+          <option value="CLASSICS">Classics</option>
+          <option value="CHILDREN">Children</option>
+          <option value="FANTASY">Fantasy</option>
+          <option value="ROMANCE">Romance</option>
+          <option value="THRILLER">Thriller</option>
+        </select><br><br><br>
+      </div>
+      <button type="submit" class="btn btn-success">Save changes</button>
+    </form>
+  </div>
+
+  <a href="/admin" class="back-link">Back to Admin Panel</a>
+
+</head>
+</html>

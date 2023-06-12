@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <title>User Orders</title>
+  <style>
+        body {
+            padding: 10px;
+            max-width: 1100px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .book-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .book-details {
+            margin-left: 10px;
+        }
+
+        .book-image-container {
+            margin-left: auto;
+        }
+
+        .book-image {
+            object-fit: cover;
+        }
+        .top-right{
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h2>User details:</h2>
+<p>User name: <span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span></p>
+<p>Email: <span th:text="${user.email}"></span></p>
+<p>Address: <span th:text="${user.address}"></span></p>
+<p>Phone number: <span th:text="${user.phoneNumber}"></span></p>
+
+<h2>Orders:</h2>
+<table>
+  <tr>
+    <th>Order date</th>
+    <th>Total amount</th>
+    <th>Books</th>
+  </tr>
+
+  <tr th:each="order : ${userOrders}">
+    <td th:text="${#temporals.format(order.orderDateTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+    <td th:text="'$'+${order.totalAmount}"></td>
+    <td>
+      <a th:href="@{'/account/order/' + ${order.id}}">View details</a>
+    </td>
+  </tr>
+</table>
+
+<div class="top-right" sec:authorize="hasRole('ADMIN')">
+  <a href="/admin" class="back-link">Back to Admin Panel</a>
+</div>
+
+<div class="top-right" sec:authorize="hasRole('MANAGER')">
+  <a href="/manager" class="back-link">Back to Manager Panel</a>
+</div>
+</body>
+</html>
