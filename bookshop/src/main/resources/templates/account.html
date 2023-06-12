@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>My account</title>
+    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="style-footer.css">
+    <style>
+          section {
+            padding: 20px;
+            text-align: center;
+        }
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h3{
+        margin-right: 10px;
+        }
+    nav1 ul {
+            list-style-type: none;
+        }
+         nav1 ul li a {
+            text-decoration: none;
+            padding: 5px;
+            font-size: 17px;
+            color: darkblue;
+            padding: 5px;
+        }
+        li{
+        line-height: 1.5;
+        }
+    </style>
+
+    <div th:insert="header.html :: header"></div>
+    <div th:insert="footer.html :: footer"></div>
+
+</head>
+<body>
+
+<nav1>
+    <ul><h3>My account</h3>
+        <li><a href="/account">Dashboard</a></li>
+        <li><a href="/account/personal-details">Personal Details</a></li>
+        <li><a href="/account/orders">Orders</a></li>
+    </ul>
+</nav1>
+<section>
+    <h2>-----------Your dashboard-----------</h2>
+    <h1 sec:authorize="isAuthenticated()">Welcome <span sec:authentication="principal.username">User</span></h1>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <style>
+        body {
+            padding: 10px;
+            max-width: 1100px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .book-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .book-details {
+            margin-left: 10px;
+            flex-grow: 1;
+        }
+
+        .book-image-container {
+            margin-left: auto;
+        }
+
+        .book-image {
+            object-fit: cover;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+    </style>
+</head>
+<body>
+<a sec:authorize="hasRole('USER')" href="/account" class="back-link">Back to your dashboard</a>
+<a sec:authorize="hasRole('ADMIN')" href="/admin" class="back-link">Back to Admin Panel</a>
+<a sec:authorize="hasRole('MANAGER')" href="/manager" class="back-link">Back to Manager Panel</a>
+
+<h2>Order Details:</h2>
+<table>
+  <tr>
+  </tr>
+
+  <tr th:each="itemDto : ${orderDto.items}">
+    <td>
+      <div class="book-info">
+        <div class="book-image-container">
+          <img th:src="@{/images/{id}(id=${itemDto.book.images.id})}" alt="Book Image" class="book-image"
+               style="width: 60px; height: 100px;" src="">
+        </div>
+        <div class="book-details">
+          <h4>
+            <a th:href="@{'/book/' + ${itemDto.book.id}}">
+              <span th:text="${itemDto.book.title}"></span>
+            </a>
+          </h4>
+          <p>Price: $<span th:text="${itemDto.price}"></span></p>
+          <p>Quantity: <span th:text="${itemDto.quantity}"></span></p>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+</table>
+</body>
+</html>

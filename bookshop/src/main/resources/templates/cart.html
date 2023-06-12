@@ -1,0 +1,201 @@
+    <!DOCTYPE>
+    <html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Cart</title>
+        <link rel="stylesheet" href="style-header.css">
+
+        <style>
+         body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 60px;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    .book-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .book-image {
+      width: 100px;
+      height: auto;
+    }
+
+    .book-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    table {
+      width: 80%;
+      border-collapse: collapse;
+      margin: 20px auto;
+    }
+
+    th, td {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid black;
+    }
+
+    th {
+      background-color: lightgray;
+    }
+
+    h3 {
+      padding: 17px;
+      font-size: 25px;
+      margin-top: 0;
+      text-align: center;
+      color: #333333;
+    }
+
+    .button-group form {
+        display: inline;
+        margin-right: 10px;
+    }
+
+    .button-group form button {
+        border: none;
+        background: none;
+        padding: 0;
+        text-decoration: none;
+        cursor: pointer;
+        }
+
+        .button-group form button:hover {
+        text-decoration: underline;
+        }
+
+      .button-group1 {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 20px;
+      margin-left: 20px;
+        }
+
+        .order-button {
+      margin-right: 10px;
+      background-color: #000080;
+      color: white;
+      font-size: 16px;
+      padding: 8px 12px;
+        }
+
+        .empty-button {
+          background-color: #000080;
+          color: white;
+          font-size: 16px;
+          padding: 8px 12px;
+        }
+
+        footer {
+      background-color: #808080;
+      color: #fff;
+      padding: 5px;
+      text-align: center;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+        }
+      .small-input {
+      width: 50px;
+    }
+        </style>
+
+    </head>
+    <body>
+    <div th:insert="header.html :: header"></div>
+
+    <h3>Your cart</h3>
+    <div th:if="${cart != null && !cart.isEmpty()}">
+        <div class="main-content">
+            <div class="button-group1">
+
+                <form th:action="@{/place-order}" method="post" class="order-form">
+                    <button type="submit" class="order-button">Place Order</button>
+                </form>
+
+                <form th:action="@{/cart/removeAll}" method="post">
+                    <button type="submit" class="empty-button">Empty Cart</button>
+                </form>
+            </div>
+
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Sub-total</th>
+            </tr>
+
+            <tr th:each="item : ${cart}">
+                <td>
+                    <div class="book-info">
+                        <img th:src="@{'/images/' + ${item.book.images.id}}" alt="Book Image" class="book-image" src="">
+                        <div class="book-details">
+                            <h4>
+                                <a th:href="@{'/book/' + ${item.book.id}}">
+                                    <span th:text="${item.book.title}"></span>
+                                </a>
+                            </h4>
+                            <p>Author(s):
+                                <span th:each="author, iterStar : ${item.book.authors}">
+                                <span th:text="${author.name}"></span>
+                                <span th:if="${!iterStar.last}">, </span>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </td>
+                <td th:text="'$'+${item.book.price}"></td>
+                <td>
+                    <div class="button-group">
+                        <form th:action="@{/cart/update/{id}(id=${item.book.id})}" method="post" class="update-form">
+                            <input type="hidden" name="id" th:value="${item.book.id}" />
+                            <input type="number" name="quantity" th:value="${item.quantity}" min="1" class="small-input"/>
+                            <button class="update-button" type="submit">Update</button>
+                        </form>
+
+                        <form th:action="@{/cart/remove/{id}(id=${item.book.id})}" method="post" class="remove-form">
+                            <button type="submit">Remove</button>
+                        </form>
+
+                        </div>
+
+                </td>
+                    <td th:text="'$'+${item.quantity * item.book.price}"></td>
+                <tr>
+                    <td colspan="3"></td>
+                    <td>Sub-total:</td>
+                    <td th:text="'$'+${totalAmount}"></td>
+                </tr>
+            </table>
+        </div>
+        </div>
+
+           <div th:if="${cart == null || cart.isEmpty()}" class="empty-cart">
+            Your have no items in your cart...
+               <a th:href="'/books'" class="btn btn-warning">Continue shopping</a>
+           </div>
+        <div th:insert="footer.html :: footer"></div>
+        </body>
+        </html>

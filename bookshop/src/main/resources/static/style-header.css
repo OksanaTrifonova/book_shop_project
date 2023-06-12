@@ -1,0 +1,43 @@
+ header {
+            background-color: 	#808080;
+            color: #fff;
+            padding: 10px;
+        }
+
+
+        nav {
+            background-color: 	#808080;
+            padding: 10px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        nav ul li a {
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 5px;
+
+        }
+
+    nav ul li a:hover {
+    text-decoration: underline;
+}
+    oval-button {
+        display: inline-block;
+        padding: 10px 20px;
+        color: white;
+        text-decoration: none;
+        border-radius: 50%;
+    }
+    oval-button:hover {
+                   text-decoration: underline;
+               }

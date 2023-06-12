@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Book authors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+
+        h3 {
+            color: #333;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 200px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.delete-button {
+            padding: 8px 12px;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .top-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+
+        </style>
+    </head>
+    <body>
+    <h4 class="text-center">Book authors</h4>
+    <table>
+    <thead>
+    <tr>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="author : ${authors}">
+        <td>
+            <a th:href="@{'/authors/' + ${author.id} + '/edit'}" th:text="${author.name}"></a>
+        </td>
+        <td>
+        <span th:if="${author.deathYear != null}">
+            <span th:text="' ( ' + ${author.birthYear} + ' - ' + ${author.deathYear} + ' )'"></span>
+        </span>
+            <span th:unless="${author.deathYear != null}">
+            <span th:text="${author.birthYear}"></span>
+        </span>
+        </td>
+        <td>
+            <a th:href="@{'/authors/' + ${author.id} + '/books'}">Books</a>
+        </td>
+    </tr>
+    </tbody>
+    </table>
+    <h4 class="text-center">Add new author</h4>
+    <form th:action="@{/authors}" method="post">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required /><br>
+        <label for="birthYear">BirthYear:</label>
+        <input type="number" id="birthYear" name="birthYear" /><br>
+        <label for="deathYear">DeathYear:</label>
+        <input type="number" id="deathYear" name="deathYear" /><br>
+        <button type="submit">Add author</button>
+    </form><br><br><br><br>
+
+
+    <div sec:authorize="hasRole('ADMIN')" class="text-center">
+        <a href="/admin" class="back-link">Back to Admin Panel</a></div>
+    <div sec:authorize="hasRole('MANAGER')" class="text-center">
+        <a href="/manager" class="back-link">Back to Manager Panel</a>
+    </div>
+
+    </body>
+    </html>

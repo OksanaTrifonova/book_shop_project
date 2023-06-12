@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 300px;
+            margin: 100px auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .error-message {
+         color: red;
+         text-align:center;
+}
+
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+  <h1>Add book</h1>
+  <form th:object="${book}" action="/book/add" method="post" enctype="multipart/form-data">
+
+    <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error-message"></span><br>
+    <input type="text" id="title" name="title" placeholder="Add book title" class="form-control" th:value="${book.title}"
+           value="${book.title}" required oninvalid="this.setCustomValidity('Title is required')" oninput="this.setCustomValidity('')"><br><br>
+    <div class="form-group">
+      <label for="authorIds">Author:</label>
+      <select id="authorIds" name="authorIds" class="form-control" multiple="multiple" required oninvalid="this.setCustomValidity('At least one author must be selected')" oninput="this.setCustomValidity('')">
+        <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}" th:selected="${book.authorIds.contains(author.id)}"></option>
+      </select>
+    </div>
+    <span th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger error-text"></span><br>
+    <input type="text" id="price" name="price" placeholder="Add book price" class="form-control"
+           th:field="*{price}" th:errorclass="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
+           required oninvalid="this.setCustomValidity('Price is required')" oninput="this.setCustomValidity('')"
+           title="Invalid price format. Please enter a valid decimal number"><br><br>
+
+    <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></span><br>
+    <input type="text" id="description" name="description" placeholder="Add book description" class="form-control" th:value="${book.description}" value="${book.description}"
+           required oninvalid="this.setCustomValidity('Description is required')" oninput="this.setCustomValidity('')"><br><br>
+    <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></span><br>
+    <div class="form-group">
+      <label for="category">Category:</label>
+      <select id="category" name="category" required>
+        <option value="DETECTIVE">Detective</option>
+        <option value=" CLASSICS">Classics</option>
+        <option value="CHILDREN">Children</option>
+        <option value="FANTASY">Fantasy</option>
+        <option value="ROMANCE">Romance</option>
+        <option value="THRILLER">Thriller</option>
+        <option value="SCIENCE_FICTION">Science_fiction</option>
+
+      </select><br><br><br>
+    </div>
+    <input type="file" name="file" required oninvalid="this.setCustomValidity('File is required')" oninput="this.setCustomValidity('')"/><br><br>
+
+    <input type="hidden" id="authorId" name="authorId" th:value="${selectedAuthorId}" />
+
+    <button type="submit" class="btn btn-success">Add the book</button>
+    <a href="/" class="back-link">Back to Home</a>
+  </form>
+
+</div>
+</body>
+</html>
+<!--    <span th:if="${#fields.hasErrors('author')}" th:errors="*{author}" class="error-message"></span><br>-->
+<!--    <input type="text" id="author" name="author" placeholder="Add book author" class="form-control" th:value="${book.author}" value="${book.author}"><br><br>-->
+<!--    <div class="form-group">-->
+<!--      <label for="authorIds">Author:</label>-->
+<!--      <select id="authorIds" name="authorId" class="form-control" multiple="multiple">-->
+<!--        <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.firstName + ' ' + author.lastName}" th:selected="${book.authors.contains(author)}"></option>-->
+<!--      </select>-->
+<!--    </div>-->
