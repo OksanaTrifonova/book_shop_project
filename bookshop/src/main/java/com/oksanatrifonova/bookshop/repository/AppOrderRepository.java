@@ -1,7 +1,7 @@
 package com.oksanatrifonova.bookshop.repository;
 
-import com.oksanatrifonova.bookshop.entity.BookOrder;
 import com.oksanatrifonova.bookshop.entity.AppUser;
+import com.oksanatrifonova.bookshop.entity.BookOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

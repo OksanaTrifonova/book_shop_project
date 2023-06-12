@@ -2,15 +2,13 @@ package com.oksanatrifonova.bookshop.controller;
 
 import com.oksanatrifonova.bookshop.component.Cart;
 import com.oksanatrifonova.bookshop.dto.AppUserDto;
-import com.oksanatrifonova.bookshop.dto.ItemDto;
-
 import com.oksanatrifonova.bookshop.dto.BookOrderDto;
-import com.oksanatrifonova.bookshop.entity.Item;
-import com.oksanatrifonova.bookshop.entity.BookOrder;
+import com.oksanatrifonova.bookshop.dto.ItemDto;
 import com.oksanatrifonova.bookshop.entity.AppUser;
-import com.oksanatrifonova.bookshop.mapper.ItemMapper;
-
+import com.oksanatrifonova.bookshop.entity.BookOrder;
+import com.oksanatrifonova.bookshop.entity.Item;
 import com.oksanatrifonova.bookshop.mapper.AppUserMapper;
+import com.oksanatrifonova.bookshop.mapper.ItemMapper;
 import com.oksanatrifonova.bookshop.service.AppOrderService;
 import com.oksanatrifonova.bookshop.service.AppUserServiceImpl;
 import lombok.AllArgsConstructor;
@@ -44,9 +42,9 @@ public class OrderController {
         AppUser existingUser = userService.findUserByEmail(email);
         if (StringUtils.isEmpty(existingUser.getAddress()) || StringUtils.isEmpty(existingUser.getPhoneNumber())) {
             model.addAttribute("message", "Please fill in your address and phone number in your profile before placing an order.");
-            AppUser user =userService.getCurrentUser();
+            AppUser user = userService.getCurrentUser();
 
-            AppUserDto userDto = userMapper.mapToUserDto(user) ;
+            AppUserDto userDto = userMapper.mapToUserDto(user);
             model.addAttribute("personalDetails", userDto);
             return "personal-details";
         }

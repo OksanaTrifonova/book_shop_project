@@ -9,9 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book,Long> {
+public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByActive(boolean active);
+
     List<Book> findBooksByCategoryAndActive(Category category, boolean active);
+
     List<Book> findBooksByAuthorsAndActive(BookAuthor author, boolean active);
 
 }

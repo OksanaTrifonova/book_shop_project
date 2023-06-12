@@ -1,8 +1,7 @@
 package com.oksanatrifonova.bookshop.controller;
 
-import com.oksanatrifonova.bookshop.entity.AppUser;
 import com.oksanatrifonova.bookshop.dto.AppUserDto;
-
+import com.oksanatrifonova.bookshop.entity.AppUser;
 import com.oksanatrifonova.bookshop.mapper.AppUserMapper;
 import com.oksanatrifonova.bookshop.service.AppUserServiceImpl;
 import lombok.AllArgsConstructor;
@@ -10,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.security.Principal;
 
@@ -57,7 +58,7 @@ public class UserController {
 
     @PostMapping("/account/personal-details")
     public String addPersonalDetails(@ModelAttribute("personalDetails") AppUserDto userDto,
-                                     Principal principal, BindingResult bindingResult, Model model) {
+                                     Principal principal) {
         String email = principal.getName();
         AppUser existingUser = userService.findUserByEmail(email);
         userService.updatePersonalDetails(existingUser, userDto);

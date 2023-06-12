@@ -8,10 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AppUserRepository extends JpaRepository<AppUser,Long> {
+public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     AppUser findByEmail(String email);
+
     List<AppUser> findByActive(boolean active);
+
     long countByRoleAndActive(Role role, boolean active);
 
 

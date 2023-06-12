@@ -2,7 +2,10 @@ package com.oksanatrifonova.bookshop.dto;
 
 import com.oksanatrifonova.bookshop.entity.Role;
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.EnumType;
@@ -14,7 +17,7 @@ import javax.persistence.Enumerated;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppUserDto {
- private Long id;
+    private Long id;
     @NotNull
     private String firstName;
     @NotNull

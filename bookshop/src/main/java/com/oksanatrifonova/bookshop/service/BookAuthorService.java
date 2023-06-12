@@ -18,12 +18,13 @@ public class BookAuthorService {
     private final BookAuthorMapper bookAuthorMapper;
 
 
-    public BookAuthorDto createBookAuthor(String name, Integer birthYear, Integer deathYear) {
-        BookAuthor bookAuthor = new BookAuthor(name,birthYear,deathYear);
+    public void createBookAuthor(String name, Integer birthYear, Integer deathYear) {
+        BookAuthor bookAuthor = new BookAuthor(name, birthYear, deathYear);
         bookAuthor.setActive(true);
         bookAuthor = bookAuthorRepository.save(bookAuthor);
-        return bookAuthorMapper.toDto(bookAuthor);
+        bookAuthorMapper.toDto(bookAuthor);
     }
+
     public void editBookAuthor(Long authorId, String name, Integer birthYear, Integer deathYear) {
         BookAuthor bookAuthor = bookAuthorRepository.findById(authorId)
                 .orElseThrow(() -> new IllegalArgumentException("Author not found"));
@@ -38,9 +39,9 @@ public class BookAuthorService {
     public void deleteBookAuthor(Long id) {
         BookAuthor bookAuthor = bookAuthorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Author not found"));
-        if (bookAuthor!=null){
-        bookAuthor.setActive(false);
-        bookAuthorRepository.save(bookAuthor);
+        if (bookAuthor != null) {
+            bookAuthor.setActive(false);
+            bookAuthorRepository.save(bookAuthor);
         }
     }
 
@@ -51,7 +52,7 @@ public class BookAuthorService {
                 .collect(Collectors.toList());
     }
 
-    public BookAuthorDto getAuthorById(Long id){
+    public BookAuthorDto getAuthorById(Long id) {
         BookAuthor author = bookAuthorRepository.getById(id);
         return bookAuthorMapper.toDto(author);
     }

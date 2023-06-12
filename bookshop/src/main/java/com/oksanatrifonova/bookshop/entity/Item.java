@@ -4,7 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import java.math.BigDecimal;
 
 @Setter
@@ -19,10 +24,11 @@ public class Item {
     private Book book;
     private int quantity;
     private BigDecimal price;
-    public Item(Book book, int quantity,BigDecimal price) {
+
+    public Item(Book book, int quantity, BigDecimal price) {
         this.book = book;
         this.quantity = quantity;
-        this.price=price;
+        this.price = price;
     }
 
     public Item() {

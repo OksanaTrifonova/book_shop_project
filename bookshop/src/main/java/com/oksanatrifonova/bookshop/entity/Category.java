@@ -7,5 +7,5 @@ public enum Category {
     ROMANCE,
     SCIENCE_FICTION,
     THRILLER,
-    CHILDREN;
+    CHILDREN
 }

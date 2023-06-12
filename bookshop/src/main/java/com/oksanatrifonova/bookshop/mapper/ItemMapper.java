@@ -24,11 +24,13 @@ public class ItemMapper {
         itemDTO.setPrice(item.getPrice());
         return itemDTO;
     }
+
     public List<Item> convertToEntityList(List<ItemDto> itemDTOList) {
         return itemDTOList.stream()
                 .map(this::convertToEntity)
                 .collect(Collectors.toList());
     }
+
     public List<ItemDto> convertToDtoList(List<Item> itemList) {
         return itemList.stream()
                 .map(this::convertToDTO)

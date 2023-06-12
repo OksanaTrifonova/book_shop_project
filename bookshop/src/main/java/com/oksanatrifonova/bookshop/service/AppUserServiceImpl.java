@@ -1,9 +1,9 @@
 package com.oksanatrifonova.bookshop.service;
 
-import com.oksanatrifonova.bookshop.entity.Role;
-import com.oksanatrifonova.bookshop.entity.AppUser;
 import com.oksanatrifonova.bookshop.dto.AppUserDetails;
 import com.oksanatrifonova.bookshop.dto.AppUserDto;
+import com.oksanatrifonova.bookshop.entity.AppUser;
+import com.oksanatrifonova.bookshop.entity.Role;
 import com.oksanatrifonova.bookshop.mapper.AppUserMapper;
 import com.oksanatrifonova.bookshop.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -38,24 +37,23 @@ public class AppUserServiceImpl implements AppUserService {
         return userRepository.findByEmail(email);
     }
 
-    public AppUser findUserById(Long id){
-       return userRepository.findById(id).orElseThrow(null);
+    public AppUser findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(null);
     }
 
-    public void updateUserRole(Long id,String newRole){
+    public void updateUserRole(Long id, String newRole) {
         Optional<AppUser> user = userRepository.findById(id);
-        if (user.isPresent()){
+        if (user.isPresent()) {
             AppUser appUser = user.get();
             appUser.setRole(Role.valueOf(newRole));
             userRepository.save(appUser);
-        }else{
-            throw  new IllegalArgumentException("User not found");
+        } else {
+            throw new IllegalArgumentException("User not found");
         }
     }
 
 
-    @Override
-    public AppUser registerUser(AppUserDto userDto) {
+    public void registerUser(AppUserDto userDto) {
         if (emailExists(userDto.getEmail())) {
             throw new IllegalArgumentException("Email already exists: " + userDto.getEmail());
         }
@@ -70,7 +68,6 @@ public class AppUserServiceImpl implements AppUserService {
             user.setPhoneNumber(userDto.getPhoneNumber());
         }
         userRepository.save(user);
-        return user;
     }
 
     public boolean emailExists(String email) {
@@ -109,7 +106,7 @@ public class AppUserServiceImpl implements AppUserService {
 
 
     public void updatePersonalDetails(AppUser existingUser, AppUserDto userDto) {
-        AppUser user =userMapper.mapToUser(userDto);
+        AppUser user = userMapper.mapToUser(userDto);
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());

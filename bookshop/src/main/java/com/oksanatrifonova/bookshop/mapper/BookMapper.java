@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 @Component
 @AllArgsConstructor
 public class BookMapper {
     private BookAuthorRepository bookAuthorRepository;
+
     public BookDto toDto(Book book) {
         BookDto bookDto = new BookDto();
         bookDto.setId(book.getId());

@@ -14,20 +14,16 @@ import java.util.Collections;
 public class AppUserDetails implements UserDetails {
 
     private AppUserDto user;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String userRole = user.getRole().name();
-        String role = null;
-        switch (userRole) {
-            case "USER":
-                role = "ROLE_USER";
-                break;
-            case "ADMIN":
-                role="ROLE_ADMIN";
-                break;
-            case "MANAGER":
-                role="ROLE_MANAGER";
-        }
+        String role = switch (userRole) {
+            case "USER" -> "ROLE_USER";
+            case "ADMIN" -> "ROLE_ADMIN";
+            case "MANAGER" -> "ROLE_MANAGER";
+            default -> null;
+        };
 
         return Collections.singletonList(new SimpleGrantedAuthority(role));
     }

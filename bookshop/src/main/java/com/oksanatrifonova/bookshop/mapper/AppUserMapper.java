@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 public class AppUserMapper {
 
-  public AppUserDto mapToUserDto(AppUser user) {
+    public AppUserDto mapToUserDto(AppUser user) {
         AppUserDto userDto = new AppUserDto();
         userDto.setId(user.getId());
         userDto.setFirstName(user.getFirstName());
@@ -23,21 +23,22 @@ public class AppUserMapper {
         userDto.setAddress(user.getAddress());
         return userDto;
     }
-      public List<AppUserDto> mapToUserDtoList(List<AppUser> userList) {
-            return userList.stream()
-                    .map(this::mapToUserDto)
-                    .collect(Collectors.toList());
-      }
 
-      public AppUser mapToUser(AppUserDto userDto) {
-            AppUser user = new AppUser();
-            user.setId(userDto.getId());
-            user.setFirstName(userDto.getFirstName());
-            user.setLastName(userDto.getLastName());
-            user.setEmail(userDto.getEmail());
-            user.setRole(userDto.getRole());
-            user.setPhoneNumber(userDto.getPhoneNumber());
-            user.setAddress(userDto.getAddress());
-            return user;
-      }
+    public List<AppUserDto> mapToUserDtoList(List<AppUser> userList) {
+        return userList.stream()
+                .map(this::mapToUserDto)
+                .collect(Collectors.toList());
+    }
+
+    public AppUser mapToUser(AppUserDto userDto) {
+        AppUser user = new AppUser();
+        user.setId(userDto.getId());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+        user.setRole(userDto.getRole());
+        user.setPhoneNumber(userDto.getPhoneNumber());
+        user.setAddress(userDto.getAddress());
+        return user;
+    }
 }

@@ -5,14 +5,15 @@ import com.oksanatrifonova.bookshop.dto.BookOrderDto;
 import com.oksanatrifonova.bookshop.entity.AppUser;
 import com.oksanatrifonova.bookshop.service.AppOrderService;
 import com.oksanatrifonova.bookshop.service.AppUserServiceImpl;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-
 import org.springframework.validation.BindingResult;
-
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/user/add")
-    public String viewUserAddForm(Model model) {
+    public String viewUserAddForm() {
         return "user-add";
     }
 

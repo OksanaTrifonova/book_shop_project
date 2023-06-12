@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class BookOrderMapper {
     private final ItemMapper itemMapper;
 
-    public BookOrderDto convertToDto(BookOrder order){
+    public BookOrderDto convertToDto(BookOrder order) {
         BookOrderDto orderDto = new BookOrderDto();
         orderDto.setId(order.getId());
         orderDto.setItems(itemMapper.convertToDtoList(order.getItems()));

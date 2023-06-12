@@ -10,16 +10,21 @@ import com.oksanatrifonova.bookshop.service.BookService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -86,7 +91,7 @@ public class BookController {
         if (bookDto.getPrice() == null || bookDto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             bindingResult.rejectValue("price", "error.book.price", "Price is required");
         }
-        if (bookDto.getDescription()==null || bookDto.getDescription().isEmpty()) {
+        if (bookDto.getDescription() == null || bookDto.getDescription().isEmpty()) {
             bindingResult.rejectValue("description", "error.book.description", "Description is required");
         }
         for (ObjectError error : bindingResult.getAllErrors()) {
@@ -102,6 +107,7 @@ public class BookController {
         bookService.saveBook(bookDto, file, authorIds);
         return "redirect:/books";
     }
+
     @GetMapping("/book/{id}")
     public String bookDetails(@PathVariable Long id, Model model) {
         int cartItemCount = cart.getCart().stream()
@@ -120,6 +126,7 @@ public class BookController {
         bookService.deleteBook(id);
         return "redirect:/books";
     }
+
     @PostMapping("/book/{id}/active")
     public String activeBook(@PathVariable Long id) {
         bookService.setBookToActive(id);

@@ -5,9 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -27,9 +34,9 @@ public class BookAuthor {
     private Set<Book> books = new HashSet<>();
     private boolean active;
 
-    public BookAuthor(String name,Integer birthYear,Integer deathYear) {
+    public BookAuthor(String name, Integer birthYear, Integer deathYear) {
         this.name = name;
         this.birthYear = birthYear;
-        this.deathYear= deathYear;
+        this.deathYear = deathYear;
     }
 }

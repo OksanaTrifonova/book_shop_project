@@ -20,9 +20,9 @@ public class ItemDto {
 
     }
 
-    public ItemDto(Book book, int quantity,BigDecimal price) {
+    public ItemDto(Book book, int quantity, BigDecimal price) {
         this.book = book;
         this.quantity = quantity;
-        this.price=price;
+        this.price = price;
     }
 }

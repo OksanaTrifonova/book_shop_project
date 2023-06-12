@@ -4,12 +4,9 @@ import com.oksanatrifonova.bookshop.component.Cart;
 import com.oksanatrifonova.bookshop.dto.BookAuthorDto;
 import com.oksanatrifonova.bookshop.dto.BookDto;
 import com.oksanatrifonova.bookshop.dto.ItemDto;
-import com.oksanatrifonova.bookshop.entity.Book;
 import com.oksanatrifonova.bookshop.service.BookAuthorService;
 import com.oksanatrifonova.bookshop.service.BookService;
-
 import lombok.AllArgsConstructor;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,29 +34,30 @@ public class CartController {
         List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
         BigDecimal totalAmount = cart.calculateTotalAmount();
         model.addAttribute("totalAmount", totalAmount.toString());
-        model.addAttribute("cart",cart.getCart());
+        model.addAttribute("cart", cart.getCart());
         model.addAttribute("authors", authors);
         return "cart";
     }
+
     @GetMapping("/book/{id}/cart")
-    public String addToCart(@PathVariable("id") Long id,Model model) {
-        BookDto book =bookService.getBookById(id);
-        if (book!=null){
-            cart.addItemToCart(book,1,book.getPrice());
+    public String addToCart(@PathVariable("id") Long id, Model model) {
+        BookDto book = bookService.getBookById(id);
+        if (book != null) {
+            cart.addItemToCart(book, 1, book.getPrice());
             cart.calculateTotalAmount();
             int cartItemCount = cart.getCart().stream()
                     .mapToInt(ItemDto::getQuantity)
                     .sum();
-            model.addAttribute("cartItemCount",cartItemCount);
+            model.addAttribute("cartItemCount", cartItemCount);
         }
         return "redirect:/books";
     }
 
     @PostMapping("/cart/remove/{id}")
-    public String removeItemById(@PathVariable("id") Long id){
-    cart.removeItemById(id);
+    public String removeItemById(@PathVariable("id") Long id) {
+        cart.removeItemById(id);
 
-    return "redirect:/cart";
+        return "redirect:/cart";
     }
 
     @PostMapping("/cart/removeAll")
@@ -67,9 +65,10 @@ public class CartController {
         cart.removeAllItems();
         return "redirect:/cart";
     }
+
     @PostMapping("/cart/update/{id}")
-    public String updateCartItem (@PathVariable("id") Long id,@RequestParam("quantity") int quantity){
-        cart.update(id,quantity);
+    public String updateCartItem(@PathVariable("id") Long id, @RequestParam("quantity") int quantity) {
+        cart.update(id, quantity);
         cart.calculateTotalAmount();
         return "redirect:/cart";
     }
