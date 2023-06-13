@@ -21,6 +21,10 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 public class EmployeeController {
+    private static final String USERS_PATH = "users";
+    private static final String USER_ADD_VIEW = "user-add";
+
+    private static final String REDIRECT_USERS_PATH = "redirect:/" + USERS_PATH;
     private AppUserServiceImpl userService;
     private AppOrderService orderService;
 
@@ -37,32 +41,39 @@ public class EmployeeController {
     @GetMapping("/users")
     public String viewUsers(Model model) {
         List<AppUserDto> activeUsers = userService.findActiveUsersDto();
-        model.addAttribute("users", activeUsers);
-        return "users";
+        model.addAttribute(USERS_PATH, activeUsers);
+        return USERS_PATH;
     }
 
     @GetMapping("/user/add")
     public String viewUserAddForm() {
-        return "user-add";
+        return USER_ADD_VIEW;
     }
 
     @PostMapping("/users/set-role")
     public String updateUserRole(@RequestParam("userId") Long userId, @ModelAttribute("role") String newRole) {
         userService.updateUserRole(userId, newRole);
-        return "redirect:/users";
+        return REDIRECT_USERS_PATH;
     }
 
     @PostMapping("/user/add")
-    public String addUser(@ModelAttribute("userDto") AppUserDto userDto, BindingResult bindingResult) {
+    public String addUser(@ModelAttribute("userDto") AppUserDto userDto, BindingResult bindingResult,
+                          Model model) {
         if (bindingResult.hasErrors()) {
-            return "user-add";
+            model.addAttribute("user", userDto);
+            return USER_ADD_VIEW;
         }
         try {
             userService.addUser(userDto);
-            return "redirect:/users";
+            return REDIRECT_USERS_PATH;
         } catch (IllegalArgumentException e) {
-            bindingResult.rejectValue("email", "error.userDto", e.getMessage());
-            return "users";
+            if (userService.emailExists(userDto.getEmail())) {
+                model.addAttribute("message",
+                        "There is already an account registered with the same email");
+                model.addAttribute("user", userDto);
+                return USER_ADD_VIEW;
+            }
+            return USERS_PATH;
         }
     }
 

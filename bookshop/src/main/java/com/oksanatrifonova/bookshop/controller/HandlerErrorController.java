@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
+public class HandlerErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
 
 
     @RequestMapping("/error")

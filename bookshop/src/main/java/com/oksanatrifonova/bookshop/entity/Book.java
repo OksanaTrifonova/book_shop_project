@@ -40,7 +40,7 @@ public class Book {
     private String description;
     @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER,
             mappedBy = "book")
-    private Images images;
+    private Image images;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "book_author",
@@ -50,10 +50,6 @@ public class Book {
     private Set<BookAuthor> authors = new HashSet<>();
     private boolean active;
 
-    public void addAuthors(Set<BookAuthor> authors) {
-        this.authors.addAll(authors);
-        authors.forEach(author -> author.getBooks().add(this));
-    }
 
     public Book(String title, Set<BookAuthor> authors, BigDecimal price, String description, Category category) {
         this.title = title;
@@ -63,7 +59,7 @@ public class Book {
         this.category = category;
     }
 
-    public void addImageToBook(Images image) {
+    public void addImageToBook(Image image) {
         if (images != null) {
             images.setBook(null);
         }

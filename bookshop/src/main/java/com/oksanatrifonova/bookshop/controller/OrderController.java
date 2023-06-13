@@ -14,7 +14,6 @@ import com.oksanatrifonova.bookshop.service.AppUserServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,8 +39,8 @@ public class OrderController {
         }
         String email = principal.getName();
         AppUser existingUser = userService.findUserByEmail(email);
-        if ((existingUser.getAddress() == null || existingUser.getAddress().isEmpty())||
-        (existingUser.getPhoneNumber() == null || existingUser.getPhoneNumber().isEmpty())) {
+        if ((existingUser.getAddress() == null || existingUser.getAddress().isEmpty()) ||
+                (existingUser.getPhoneNumber() == null || existingUser.getPhoneNumber().isEmpty())) {
             model.addAttribute("message", "Please fill in your address and phone number in your profile before placing an order.");
             AppUser user = userService.getCurrentUser();
 
@@ -49,7 +48,7 @@ public class OrderController {
             model.addAttribute("personalDetails", userDto);
             return "personal-details";
         }
-        List<ItemDto> orderItemsDTO = cart.getCart();
+        List<ItemDto> orderItemsDTO = cart.getItemDtoList();
         List<Item> orderItems = itemMapper.convertToEntityList(orderItemsDTO);
         BookOrder order = orderService.createOrder(existingUser, orderItems, cart);
         cart.removeAllItems();

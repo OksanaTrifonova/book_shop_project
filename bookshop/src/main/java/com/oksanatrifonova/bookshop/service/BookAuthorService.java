@@ -13,36 +13,34 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class BookAuthorService {
-
+    private static final String AUTHOR_NOT_FOUND_MSG = "Author not found";
     private final BookAuthorRepository bookAuthorRepository;
     private final BookAuthorMapper bookAuthorMapper;
 
 
-    public void createBookAuthor(String name, Integer birthYear, Integer deathYear) {
-        BookAuthor bookAuthor = new BookAuthor(name, birthYear, deathYear);
+    public void createBookAuthor(BookAuthorDto author) {
+        BookAuthor bookAuthor = new BookAuthor(author.getName(), author.getBirthYear(), author.getDeathYear());
         bookAuthor.setActive(true);
         bookAuthor = bookAuthorRepository.save(bookAuthor);
         bookAuthorMapper.toDto(bookAuthor);
     }
 
-    public void editBookAuthor(Long authorId, String name, Integer birthYear, Integer deathYear) {
+    public void editBookAuthor(Long authorId, BookAuthorDto author) {
         BookAuthor bookAuthor = bookAuthorRepository.findById(authorId)
-                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
-        bookAuthor.setName(name);
-        bookAuthor.setBirthYear(birthYear);
-        bookAuthor.setDeathYear(deathYear);
-        bookAuthor = bookAuthorRepository.save(bookAuthor);
-        bookAuthorMapper.toDto(bookAuthor);
+                .orElseThrow(() -> new IllegalArgumentException(AUTHOR_NOT_FOUND_MSG));
+        bookAuthor.setName(author.getName());
+        bookAuthor.setBirthYear(author.getBirthYear());
+        bookAuthor.setDeathYear(author.getDeathYear());
+        bookAuthor.setActive(true);
+        bookAuthorRepository.save(bookAuthor);
     }
 
 
     public void deleteBookAuthor(Long id) {
         BookAuthor bookAuthor = bookAuthorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
-        if (bookAuthor != null) {
-            bookAuthor.setActive(false);
-            bookAuthorRepository.save(bookAuthor);
-        }
+                .orElseThrow(() -> new IllegalArgumentException(AUTHOR_NOT_FOUND_MSG));
+        bookAuthor.setActive(false);
+        bookAuthorRepository.save(bookAuthor);
     }
 
     public List<BookAuthorDto> getAllBookAuthors() {
@@ -53,7 +51,8 @@ public class BookAuthorService {
     }
 
     public BookAuthorDto getAuthorById(Long id) {
-        BookAuthor author = bookAuthorRepository.getById(id);
+        BookAuthor author = bookAuthorRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(AUTHOR_NOT_FOUND_MSG));
         return bookAuthorMapper.toDto(author);
     }
 }

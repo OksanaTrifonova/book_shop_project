@@ -1,6 +1,6 @@
 package com.oksanatrifonova.bookshop.service;
 
-import com.oksanatrifonova.bookshop.entity.Images;
+import com.oksanatrifonova.bookshop.entity.Image;
 import com.oksanatrifonova.bookshop.repository.ImagesRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -15,8 +15,8 @@ import java.io.ByteArrayInputStream;
 public class ImageService {
     private ImagesRepository imagesRepository;
 
-    public ResponseEntity<?> getImageById(Long id) {
-        Images image = imagesRepository.findById(id).orElseThrow(null);
+    public ResponseEntity<InputStreamResource> getImageById(Long id) {
+        Image image = imagesRepository.findById(id).orElseThrow(null);
         return ResponseEntity.ok()
                 .header("fileName", image.getOriginalFileName())
                 .contentType(MediaType.valueOf(image.getContentType()))

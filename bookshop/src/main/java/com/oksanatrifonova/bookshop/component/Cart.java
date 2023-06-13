@@ -16,43 +16,48 @@ import java.util.Optional;
 
 public class Cart {
     private final BookMapper bookMapper;
-    private final List<ItemDto> cart;
+    private final List<ItemDto> itemDtoList;
+
     public Cart(BookMapper bookMapper) {
         this.bookMapper = bookMapper;
-        this.cart = new ArrayList<>();
+        this.itemDtoList = new ArrayList<>();
     }
 
-    public List<ItemDto> getCart() {
-        return cart;
+    public List<ItemDto> getItemDtoList() {
+        return itemDtoList;
     }
+
     public void removeAllItems() {
-        cart.clear();
+        itemDtoList.clear();
     }
+
     public void removeItemById(Long id) {
-        cart.removeIf(item -> Objects.equals(item.getBook().getId(), id));
+        itemDtoList.removeIf(item -> Objects.equals(item.getBook().getId(), id));
     }
-public void addItemToCart(BookDto bookDto, int quantity, BigDecimal price){
-    Optional<ItemDto> existingItem = cart.stream()
-            .filter(item -> item.getBook().getId().equals(bookDto.getId()))
-            .findFirst();
-    if (existingItem.isPresent()){
-        ItemDto item = existingItem.get();
-        item.setQuantity(item.getQuantity()+quantity);
-    } else {
-        Book book = bookMapper.toEntity(bookDto);
-        cart.add(new ItemDto(book, quantity, price));
+
+    public void addItemToCart(BookDto bookDto, int quantity, BigDecimal price) {
+        Optional<ItemDto> existingItem = itemDtoList.stream()
+                .filter(item -> item.getBook().getId().equals(bookDto.getId()))
+                .findFirst();
+        if (existingItem.isPresent()) {
+            ItemDto item = existingItem.get();
+            item.setQuantity(item.getQuantity() + quantity);
+        } else {
+            Book book = bookMapper.toEntity(bookDto);
+            itemDtoList.add(new ItemDto(book, quantity, price));
+        }
     }
-}
-    public void update(Long id,int quantity){
-        Optional<ItemDto> optionalItem =cart.stream()
+
+    public void update(Long id, int quantity) {
+        Optional<ItemDto> optionalItem = itemDtoList.stream()
                 .filter(item -> item.getBook().getId().equals(id))
                 .findFirst();
         optionalItem.ifPresent(item -> item.setQuantity(quantity));
     }
 
     public BigDecimal calculateTotalAmount() {
-        BigDecimal totalAmount =BigDecimal.ZERO;
-        for (ItemDto item : cart) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (ItemDto item : itemDtoList) {
             BigDecimal itemPrice = item.getBook().getPrice();
             int itemQuantity = item.getQuantity();
             BigDecimal itemTotal = itemPrice.multiply(BigDecimal.valueOf(itemQuantity));

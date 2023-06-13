@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8">
   <title>Edit</title>
@@ -53,40 +53,48 @@
     <h1>Edit a book</h1>
     <form th:object="${book}" method="post" th:action="@{/book/{id}/edit(id=${book.id})}" enctype="multipart/form-data">
 
-    <input type="text" th:value="${book.title}" name="title" placeholder="Add book title" class="form-control"
-           value="${book.title}" required oninvalid="this.setCustomValidity('Title is required')" oninput="this.setCustomValidity('')"><br>
+      <input type="text" th:value="${book.title}" name="title" placeholder="Add book title" class="form-control"
+             required oninvalid="this.setCustomValidity('Title is required')" oninput="this.setCustomValidity('')"><br>
+
       <div class="form-group">
         <label for="authors">Authors:</label>
         <select id="authors" name="authorIds[]" multiple
                 required oninvalid="this.setCustomValidity('At least one author must be selected')" oninput="this.setCustomValidity('')">
           <option value="">Select author(s)</option>
-          <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
+          <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"
+                  th:selected="${book.authorIds.contains(author.id)}"></option>
         </select><br><br>
-
       </div>
+
       <input type="text" th:value="${book.price}" name="price" placeholder="Add book price" class="form-control"
              required oninvalid="this.setCustomValidity('Price is required')" oninput="this.setCustomValidity('')"
              title="Invalid price format. Please enter a valid decimal number"><br>
+
       <input type="text" th:value="${book.description}" name="description" placeholder="Add book description" class="form-control"
              required oninvalid="this.setCustomValidity('Description is required')" oninput="this.setCustomValidity('')"><br>
+
       <input type="file" name="imageFile" accept="image/*"
-             required oninvalid="this.setCustomValidity('File is required')" oninput="this.setCustomValidity('')"/><br><br>
+             required oninvalid="this.setCustomValidity('File is required')" oninput="this.setCustomValidity('')"
+             th:attr="value=${imageFile}"/><br><br>
+
+
       <div class="form-group">
         <label for="category">Category:</label>
         <select id="category" name="category" required>
-          <option value="DETECTIVE">Detective</option>
-          <option value="CLASSICS">Classics</option>
-          <option value="CHILDREN">Children</option>
-          <option value="FANTASY">Fantasy</option>
-          <option value="ROMANCE">Romance</option>
-          <option value="THRILLER">Thriller</option>
+          <option value="DETECTIVE" th:selected="${book.category == 'DETECTIVE'}">Detective</option>
+          <option value="CLASSICS" th:selected="${book.category == 'CLASSICS'}">Classics</option>
+          <option value="CHILDREN" th:selected="${book.category == 'CHILDREN'}">Children</option>
+          <option value="FANTASY" th:selected="${book.category == 'FANTASY'}">Fantasy</option>
+          <option value="ROMANCE" th:selected="${book.category == 'ROMANCE'}">Romance</option>
+          <option value="THRILLER" th:selected="${book.category == 'THRILLER'}">Thriller</option>
         </select><br><br><br>
       </div>
-      <button type="submit" class="btn btn-success">Save changes</button>
+        <button type="submit" class="btn btn-success">Save changes</button>
     </form>
   </div>
+    <a  sec:authorize="hasRole('ADMIN')" href="/admin" class="back-link">Back to Admin Panel</a>
+  <a sec:authorize="hasRole('MANAGER')" href="/manager" class="back-link">Back to Manager Panel</a>
 
-  <a href="/admin" class="back-link">Back to Admin Panel</a>
 
 </head>
 </html>

@@ -4,9 +4,6 @@ import com.oksanatrifonova.bookshop.dto.AppUserDto;
 import com.oksanatrifonova.bookshop.entity.AppUser;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 
 @Component
 public class AppUserMapper {
@@ -22,12 +19,6 @@ public class AppUserMapper {
         userDto.setPhoneNumber(user.getPhoneNumber());
         userDto.setAddress(user.getAddress());
         return userDto;
-    }
-
-    public List<AppUserDto> mapToUserDtoList(List<AppUser> userList) {
-        return userList.stream()
-                .map(this::mapToUserDto)
-                .collect(Collectors.toList());
     }
 
     public AppUser mapToUser(AppUserDto userDto) {

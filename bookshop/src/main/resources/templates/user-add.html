@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Add new user</title>
@@ -45,11 +45,17 @@
         button:hover {
             background-color: #218838;
         }
+        .alert {
+        color: red;
+        }
     </style>
 </head>
 <body>
-<h2>Add New User</h2>
+
+<h2>Add new user</h2>
 <form action="/user/add" method="post">
+    <div th:if="${message}" class="alert alert-warning">
+        <p th:text="${message}"></p></div>
     <div class="form-group">
         <label for="firstName">First Name:</label>
         <input type="text" id="firstName" name="firstName" required><br>

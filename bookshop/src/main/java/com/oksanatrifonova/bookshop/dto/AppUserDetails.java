@@ -13,11 +13,11 @@ import java.util.Collections;
 @NoArgsConstructor
 public class AppUserDetails implements UserDetails {
 
-    private AppUserDto user;
+    private transient AppUserDto userDto;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String userRole = user.getRole().name();
+        String userRole = userDto.getRole().name();
         String role = switch (userRole) {
             case "USER" -> "ROLE_USER";
             case "ADMIN" -> "ROLE_ADMIN";
@@ -30,12 +30,12 @@ public class AppUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return userDto.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return userDto.getEmail();
     }
 
     @Override

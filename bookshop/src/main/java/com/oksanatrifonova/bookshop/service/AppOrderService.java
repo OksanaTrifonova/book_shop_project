@@ -30,11 +30,7 @@ public class AppOrderService {
         order.setTotalAmount(totalAmount);
         order.setOrderDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderRepository.save(order);
-
-        for (Item item : items) {
-            itemRepository.save(item);
-        }
-
+        items.forEach(itemRepository::save);
         return order;
     }
 
@@ -44,7 +40,6 @@ public class AppOrderService {
                 .map(orderMapper::convertToDto)
                 .collect(Collectors.toList());
     }
-
 
     public BookOrderDto getOrderById(Long id) {
         BookOrder order = orderRepository.findById(id).orElseThrow(null);

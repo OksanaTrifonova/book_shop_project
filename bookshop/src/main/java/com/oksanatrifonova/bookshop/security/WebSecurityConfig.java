@@ -19,10 +19,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private AppUserService userService;
 
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -47,8 +49,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/login/register/**")
                 .permitAll()
-                .antMatchers("/admin", "/user/add", "/user/set-role").hasAnyRole("ADMIN", "MANAGER")
-                .antMatchers("/users", "/authors/**", "/author/add/**", "authors/{id:[0-9]+}/books", "/book/add", "/book/{id:[0-9]+}/edit",
+                .antMatchers("/admin", "/user/set-role").hasAnyRole("ADMIN")
+                .antMatchers("/users", "/user/add", "/authors/**", "/author/add/**", "authors/{id:[0-9]+}/books", "/book/add", "/book/{id:[0-9]+}/edit",
                         "/book/{id:[0-9]+}/remove").hasAnyRole("ADMIN", "MANAGER")
                 .antMatchers("/manager").hasRole("MANAGER")
                 .anyRequest().authenticated()

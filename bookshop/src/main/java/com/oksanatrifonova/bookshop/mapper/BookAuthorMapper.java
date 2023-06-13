@@ -16,4 +16,5 @@ public class BookAuthorMapper {
         dto.setActive(bookAuthor.isActive());
         return dto;
     }
+
 }

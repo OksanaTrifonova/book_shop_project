@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,6 +28,10 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 public class BookController {
+    public static final String CART_ITEM_COUNT = "cartItemCount";
+    public static final String BOOKS = "books";
+    public static final String REDIRECT_BOOKS = "redirect:/" + BOOKS;
+    public static final String AUTHORS = "authors";
     private final BookService bookService;
     private final Cart cart;
     private final BookAuthorService bookAuthorService;
@@ -40,10 +43,10 @@ public class BookController {
                            Model model) {
         List<Category> categories = Arrays.asList(Category.values());
         model.addAttribute("categories", categories);
-        int cartItemCount = cart.getCart().stream()
+        int cartItemCount = cart.getItemDtoList().stream()
                 .mapToInt(ItemDto::getQuantity)
                 .sum();
-        model.addAttribute("cartItemCount", cartItemCount);
+        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
         List<BookDto> books;
         if (filterButton != null && filterButton.equals("All")) {
             books = bookService.listAllActiveBooks();
@@ -52,23 +55,23 @@ public class BookController {
         } else {
             books = bookService.listAllActiveBooks();
         }
-        model.addAttribute("books", books);
+        model.addAttribute(BOOKS, books);
         List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-        model.addAttribute("authors", authors);
-        return "books";
+        model.addAttribute(AUTHORS, authors);
+        return BOOKS;
     }
 
     @GetMapping("/books/category/{category}")
     public String getBooksByCategories(@PathVariable Category category, Model model) {
-        int cartItemCount = cart.getCart().stream()
+        int cartItemCount = cart.getItemDtoList().stream()
                 .mapToInt(ItemDto::getQuantity)
                 .sum();
-        model.addAttribute("cartItemCount", cartItemCount);
+        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
         List<BookDto> books = bookService.findBooksByCategory(category);
-        model.addAttribute("books", books);
+        model.addAttribute(BOOKS, books);
         List<Category> categories = Arrays.asList(Category.values());
         model.addAttribute("categories", categories);
-        return "books";
+        return BOOKS;
     }
 
     @GetMapping("/book/add")
@@ -77,12 +80,12 @@ public class BookController {
         BookDto bookDto = new BookDto();
         model.addAttribute("book", bookDto);
         bookDto.setAuthorIds(new ArrayList<>());
-        model.addAttribute("authors", authors);
+        model.addAttribute(AUTHORS, authors);
         return "book-add";
     }
 
     @PostMapping("/book/add")
-    public String bookAddPost(@RequestParam("file") MultipartFile file, @RequestParam("authorIds") List<Long> authorIds,
+    public String bookAddPost(@RequestParam("file") MultipartFile file,
                               @Validated BookDto bookDto, BindingResult bindingResult, Model model) throws IOException {
         if (bookDto.getTitle() == null || bookDto.getTitle().isEmpty()) {
             bindingResult.rejectValue("title", "error.book.title", "Title is required");
@@ -94,43 +97,40 @@ public class BookController {
         if (bookDto.getDescription() == null || bookDto.getDescription().isEmpty()) {
             bindingResult.rejectValue("description", "error.book.description", "Description is required");
         }
-        for (ObjectError error : bindingResult.getAllErrors()) {
-            System.out.println(error.getDefaultMessage());
-        }
 
         if (bindingResult.hasErrors()) {
             List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
             model.addAttribute("book", bookDto);
-            model.addAttribute("authors", authors);
+            model.addAttribute(AUTHORS, authors);
             return "book-add";
         }
-        bookService.saveBook(bookDto, file, authorIds);
-        return "redirect:/books";
+        bookService.saveBook(bookDto, file);
+        return REDIRECT_BOOKS;
     }
 
     @GetMapping("/book/{id}")
     public String bookDetails(@PathVariable Long id, Model model) {
-        int cartItemCount = cart.getCart().stream()
+        int cartItemCount = cart.getItemDtoList().stream()
                 .mapToInt(ItemDto::getQuantity)
                 .sum();
         List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-        model.addAttribute("cartItemCount", cartItemCount);
+        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
         BookDto bookDto = bookService.getBookById(id);
         model.addAttribute("book", bookDto);
-        model.addAttribute("authors", authors);
+        model.addAttribute(AUTHORS, authors);
         return "book-info";
     }
 
     @PostMapping("/book/{id}/remove")
     public String deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
-        return "redirect:/books";
+        return "REDIRECT_BOOKS";
     }
 
     @PostMapping("/book/{id}/active")
     public String activeBook(@PathVariable Long id) {
         bookService.setBookToActive(id);
-        return "redirect:/books";
+        return REDIRECT_BOOKS;
     }
 
 
@@ -138,11 +138,12 @@ public class BookController {
     public String showBookEditForm(@PathVariable(value = "id") Long id, Model model) {
         BookDto bookDto = bookService.getBookById(id);
         if (bookDto == null) {
-            return "redirect:/books";
+            return REDIRECT_BOOKS;
         }
         List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
         model.addAttribute("book", bookDto);
-        model.addAttribute("authors", authors);
+        model.addAttribute(AUTHORS, authors);
+
         return "book-edit";
     }
 
@@ -154,18 +155,18 @@ public class BookController {
         if (bindingResult.hasErrors()) {
             List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
             model.addAttribute("book", updatedBookDto);
-            model.addAttribute("authors", authors);
+            model.addAttribute(AUTHORS, authors);
             return "book-edit";
         }
         bookService.updateBookWithImage(updatedBookDto, file);
-        return "redirect:/books";
+        return REDIRECT_BOOKS;
     }
 
     @GetMapping("/books/filter")
     public String filterBooksByCategory(@RequestParam("category") Category category, Model model) {
         List<BookDto> filteredBooks = bookService.findBooksByCategory(category);
-        model.addAttribute("books", filteredBooks);
-        return "books";
+        model.addAttribute(BOOKS, filteredBooks);
+        return BOOKS;
     }
 
 }

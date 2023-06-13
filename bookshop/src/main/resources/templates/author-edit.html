@@ -67,18 +67,30 @@ Copy code
             margin-top: 20px;
             text-align: center;
         }
+        .error-text {
+         color: red;
+        }
 </style>
 </head>
 <body>
 <h4>Edit author's data</h4>
-<form th:action="@{'/authors/' + ${author.id} + '/edit'}" th:method="post">
-    <input type="hidden" id="authorId" name="authorId" th:value="${author.id}" />
+<form th:action="@{'/authors/' + ${author.id} + '/edit'}" method="post">
+    <input type="hidden" th:csrf />
+    <div th:if="${message}" class="alert alert-warning">
+        <p th:text="${message}"></p>
+    </div>
     <label for="name">Name:</label>
-    <input type="text" id="name" name="name" th:value="${author.name}" required /><br>
+    <input type="text" id="name" name="name" th:field="*{author.name}" required /><br>
+    <div th:if="${message}" class="alert alert-warning">
+        <p th:text="${message}"></p>
+    </div>
     <label for="birthYear">BirthYear:</label>
-    <input type="number" id="birthYear" name="birthYear" th:value="${author.birthYear}" /><br>
+    <input type="number" id="birthYear" name="birthYear" th:field="*{author.birthYear}" required /><br>
+    <p th:if="${#fields.hasErrors('author.birthYear')}" th:errors="*{author.birthYear}" class="text-danger error-text"></p>
+
     <label for="deathYear">DeathYear:</label>
-    <input type="number" id="deathYear" name="deathYear" th:value="${author.deathYear}" /><br>
+    <input type="number" id="deathYear" name="deathYear" th:field="*{author.deathYear}" /><br>
+    <p th:if="${#fields.hasErrors('author.deathYear')}" th:errors="*{author.deathYear}" class="text-danger error-text"></p>
     <button type="submit">Save changes</button>
 </form>
 

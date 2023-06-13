@@ -16,16 +16,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
 
+    private static final String USER_NOT_FOUND_MSG = "User not found";
     private final AppUserRepository userRepository;
     private final AppUserMapper userMapper;
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    BCryptPasswordEncoder passwordEncoder;
 
     public AppUserServiceImpl(AppUserRepository userRepository, AppUserMapper userMapper) {
         this.userRepository = userRepository;
@@ -38,18 +39,17 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     public AppUser findUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(null);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND_MSG));
     }
 
     public void updateUserRole(Long id, String newRole) {
-        Optional<AppUser> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            AppUser appUser = user.get();
-            appUser.setRole(Role.valueOf(newRole));
-            userRepository.save(appUser);
-        } else {
-            throw new IllegalArgumentException("User not found");
-        }
+        userRepository.findById(id).ifPresentOrElse(user -> {
+            user.setRole(Role.valueOf(newRole));
+            userRepository.save(user);
+        }, () -> {
+            throw new IllegalArgumentException(USER_NOT_FOUND_MSG);
+        });
     }
 
 
@@ -61,10 +61,10 @@ public class AppUserServiceImpl implements AppUserService {
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setActive(true);
         user.setRole(Role.USER);
-        if (userDto.getAddress() != null && !userDto.getAddress().isEmpty()) {
+        if (userDto.getAddress() != null) {
             user.setAddress(userDto.getAddress());
         }
-        if (userDto.getPhoneNumber() != null && !userDto.getPhoneNumber().isEmpty()) {
+        if (userDto.getPhoneNumber() != null) {
             user.setPhoneNumber(userDto.getPhoneNumber());
         }
         userRepository.save(user);
@@ -87,7 +87,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     public void deleteUser(Long id) {
         AppUser user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND_MSG));
 
         if (user.getRole().equals(Role.ADMIN)) {
             long adminCount = userRepository.countByRoleAndActive(Role.ADMIN, true);
@@ -100,8 +100,11 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     public List<AppUserDto> findActiveUsersDto() {
-        List<AppUser> activeUsers = userRepository.findByActive(true);
-        return userMapper.mapToUserDtoList(activeUsers);
+
+        return userRepository.findByActive(true)
+                .stream()
+                .map(userMapper::mapToUserDto)
+                .collect(Collectors.toList());
     }
 
 
@@ -134,7 +137,7 @@ public class AppUserServiceImpl implements AppUserService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         AppUser user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException(USER_NOT_FOUND_MSG);
         }
         AppUserDto userDto = userMapper.mapToUserDto(user);
         return new AppUserDetails(userDto);

@@ -3,20 +3,19 @@ package com.oksanatrifonova.bookshop.mapper;
 import com.oksanatrifonova.bookshop.dto.BookDto;
 import com.oksanatrifonova.bookshop.entity.Book;
 import com.oksanatrifonova.bookshop.entity.BookAuthor;
-import com.oksanatrifonova.bookshop.entity.Images;
-import com.oksanatrifonova.bookshop.repository.BookAuthorRepository;
+import com.oksanatrifonova.bookshop.entity.Image;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 @Component
 @AllArgsConstructor
 public class BookMapper {
-    private BookAuthorRepository bookAuthorRepository;
+
 
     public BookDto toDto(Book book) {
         BookDto bookDto = new BookDto();
@@ -49,25 +48,17 @@ public class BookMapper {
 
         List<BookAuthor> authors = new ArrayList<>();
         for (Long authorId : bookDto.getAuthorIds()) {
-            bookAuthorRepository.findById(authorId).ifPresent(authors::add);
+            BookAuthor author = new BookAuthor();
+            author.setId(authorId);
+            authors.add(author);
         }
         book.setAuthors(new HashSet<>(authors));
-
         book.setActive(bookDto.isActive());
-
-        Images image = new Images();
+        Image image = new Image();
         image.setId(bookDto.getImageId());
         book.setImages(image);
 
         return book;
-    }
-
-    public Set<BookAuthor> mapAuthorIdsToAuthors(List<Long> authorIds) {
-        Set<BookAuthor> authors = new HashSet<>();
-        for (Long authorId : authorIds) {
-            bookAuthorRepository.findById(authorId).ifPresent(authors::add);
-        }
-        return authors;
     }
 
 }

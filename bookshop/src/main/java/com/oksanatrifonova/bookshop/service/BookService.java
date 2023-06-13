@@ -4,7 +4,7 @@ import com.oksanatrifonova.bookshop.dto.BookDto;
 import com.oksanatrifonova.bookshop.entity.Book;
 import com.oksanatrifonova.bookshop.entity.BookAuthor;
 import com.oksanatrifonova.bookshop.entity.Category;
-import com.oksanatrifonova.bookshop.entity.Images;
+import com.oksanatrifonova.bookshop.entity.Image;
 import com.oksanatrifonova.bookshop.mapper.BookMapper;
 import com.oksanatrifonova.bookshop.repository.BookAuthorRepository;
 import com.oksanatrifonova.bookshop.repository.BookRepository;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,75 +29,91 @@ public class BookService {
 
 
     public List<BookDto> listAllActiveBooks() {
-        List<Book> activeBooks = bookRepository.findByActive(true);
-        return activeBooks.stream()
+        return bookRepository.findByActive(true)
+                .stream()
                 .map(bookMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public List<BookDto> findBooksByCategory(Category category) {
-        List<Book> books = bookRepository.findBooksByCategoryAndActive(category, true);
-        return books.stream()
+        return bookRepository.findBooksByCategoryAndActive(category, true)
+                .stream()
                 .map(bookMapper::toDto)
                 .collect(Collectors.toList());
 
     }
 
     public List<BookDto> findBooksByAuthor(Long authorId) {
-        BookAuthor author = bookAuthorRepository.findById(authorId).orElse(null);
-        if (author == null) {
-            return Collections.emptyList();
-        }
-        List<Book> books = bookRepository.findBooksByAuthorsAndActive(author, true);
-        return books.stream()
-                .map(bookMapper::toDto)
-                .collect(Collectors.toList());
+        return bookAuthorRepository.findById(authorId)
+                .map(author -> bookRepository.findBooksByAuthorsAndActive(author, true)
+                        .stream()
+                        .map(bookMapper::toDto)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
+    public Set<BookAuthor> mapAuthorIdsToAuthors(List<Long> authorIds) {
+        Set<BookAuthor> authors = new HashSet<>();
+        for (Long authorId : authorIds) {
+            BookAuthor author = bookAuthorRepository.findById(authorId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid author ID: " + authorId));
+            authors.add(author);
+        }
+        return authors;
+    }
+
+
     @Transactional
-    public void saveBook(BookDto bookDto, MultipartFile file, List<Long> authorIds) throws IOException {
+    public void saveBook(BookDto bookDto, MultipartFile file) throws IOException {
         Book book = bookMapper.toEntity(bookDto);
         book.setActive(true);
 
-        Images image;
+        Image image;
         if (!file.isEmpty()) {
+            if (file.getSize() >= 65535) {
+                throw new IllegalArgumentException("Image size exceeds the maximum allowed size");
+            }
             image = toImageEntity(file);
             book.addImageToBook(image);
         }
-        Set<BookAuthor> authors = bookMapper.mapAuthorIdsToAuthors(authorIds);
-        book.addAuthors(authors);
+        book.setAuthors(mapAuthorIdsToAuthors(bookDto.getAuthorIds()));
+
         bookRepository.save(book);
     }
 
-    public Images toImageEntity(MultipartFile file) throws IOException {
-        Images image = new Images();
-        image.setName(file.getName());
-        image.setOriginalFileName(file.getOriginalFilename());
-        image.setContentType(file.getContentType());
-        image.setSize(file.getSize());
-        image.setBytes(file.getBytes());
-        return image;
-    }
 
+    public Image toImageEntity(MultipartFile file) throws IOException {
+        return new Image(
+                file.getName(),
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getSize(),
+                file.getBytes()
+        );
+    }
 
     public void updateBookWithImage(BookDto updatedBookDto, MultipartFile file) throws IOException {
         Book book = bookRepository.findById(updatedBookDto.getId()).orElse(null);
         if (book != null) {
             if (!file.isEmpty()) {
-                Images existingImage = book.getImages();
-                if (existingImage != null) {
-                    existingImage.setName(file.getName());
-                    existingImage.setOriginalFileName(file.getOriginalFilename());
-                    existingImage.setContentType(file.getContentType());
-                    existingImage.setSize(file.getSize());
-                    existingImage.setBytes(file.getBytes());
+                if (file.getSize() <= 65535) {
+                    Image existingImage = book.getImages();
+                    Image updatedImage = toImageEntity(file);
+                    if (existingImage != null) {
+                        existingImage.setName(updatedImage.getName());
+                        existingImage.setOriginalFileName(updatedImage.getOriginalFileName());
+                        existingImage.setContentType(updatedImage.getContentType());
+                        existingImage.setSize(updatedImage.getSize());
+                        existingImage.setBytes(updatedImage.getBytes());
+                    } else {
+                        book.setImages(updatedImage);
+                    }
                 } else {
-                    Images image = toImageEntity(file);
-                    book.setImages(image);
+                    throw new IllegalArgumentException("Image size exceeds the maximum allowed size");
                 }
             }
             book.setTitle(updatedBookDto.getTitle());
-            book.setAuthors(bookMapper.mapAuthorIdsToAuthors(updatedBookDto.getAuthorIds()));
+            book.setAuthors(mapAuthorIdsToAuthors(updatedBookDto.getAuthorIds()));
             book.setPrice(updatedBookDto.getPrice());
             book.setDescription(updatedBookDto.getDescription());
             book.setCategory(updatedBookDto.getCategory());

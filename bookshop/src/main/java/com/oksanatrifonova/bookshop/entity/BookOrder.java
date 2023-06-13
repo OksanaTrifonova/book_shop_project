@@ -40,6 +40,8 @@ public class BookOrder {
     private BigDecimal totalAmount;
     private LocalDateTime orderDateTime;
 
+    public BookOrder() {
+    }
 
     public BookOrder(AppUser user, List<Item> items) {
         this.user = user;

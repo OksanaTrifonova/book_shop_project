@@ -20,6 +20,7 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 public class CartController {
+    private static final String REDIRECT_TO_CART = "redirect:/cart";
     private BookService bookService;
     private Cart cart;
     private final BookAuthorService bookAuthorService;
@@ -27,14 +28,14 @@ public class CartController {
 
     @GetMapping("/cart")
     public String viewCart(Model model) {
-        int cartItemCount = cart.getCart().stream()
+        int cartItemCount = cart.getItemDtoList().stream()
                 .mapToInt(ItemDto::getQuantity)
                 .sum();
         model.addAttribute("cartItemCount", cartItemCount);
         List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
         BigDecimal totalAmount = cart.calculateTotalAmount();
         model.addAttribute("totalAmount", totalAmount.toString());
-        model.addAttribute("cart", cart.getCart());
+        model.addAttribute("cart", cart.getItemDtoList());
         model.addAttribute("authors", authors);
         return "cart";
     }
@@ -45,7 +46,7 @@ public class CartController {
         if (book != null) {
             cart.addItemToCart(book, 1, book.getPrice());
             cart.calculateTotalAmount();
-            int cartItemCount = cart.getCart().stream()
+            int cartItemCount = cart.getItemDtoList().stream()
                     .mapToInt(ItemDto::getQuantity)
                     .sum();
             model.addAttribute("cartItemCount", cartItemCount);
@@ -57,20 +58,20 @@ public class CartController {
     public String removeItemById(@PathVariable("id") Long id) {
         cart.removeItemById(id);
 
-        return "redirect:/cart";
+        return REDIRECT_TO_CART;
     }
 
     @PostMapping("/cart/removeAll")
     public String removeAllItems() {
         cart.removeAllItems();
-        return "redirect:/cart";
+        return REDIRECT_TO_CART;
     }
 
     @PostMapping("/cart/update/{id}")
     public String updateCartItem(@PathVariable("id") Long id, @RequestParam("quantity") int quantity) {
         cart.update(id, quantity);
         cart.calculateTotalAmount();
-        return "redirect:/cart";
+        return REDIRECT_TO_CART;
     }
 }
 

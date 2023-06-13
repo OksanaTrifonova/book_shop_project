@@ -24,23 +24,29 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "image")
-public class Images {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
     @Column(name = "name")
     private String name;
-    @Column(name = "originalFileName")
+    @Column(name = "original_file_name")
     private String originalFileName;
     @Column(name = "size")
     private Long size;
-    @Column(name = "contentType")
+    @Column(name = "content_type")
     private String contentType;
     @Lob
     private byte[] bytes;
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Book book;
-
+    public Image(String name, String originalFileName, String contentType, long size, byte[] bytes) {
+        this.name = name;
+        this.originalFileName = originalFileName;
+        this.contentType = contentType;
+        this.size = size;
+        this.bytes = bytes;
+    }
 
 }

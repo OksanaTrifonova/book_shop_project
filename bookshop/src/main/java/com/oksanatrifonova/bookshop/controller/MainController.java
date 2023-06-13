@@ -4,7 +4,6 @@ package com.oksanatrifonova.bookshop.controller;
 import com.oksanatrifonova.bookshop.component.Cart;
 import com.oksanatrifonova.bookshop.dto.ItemDto;
 import lombok.AllArgsConstructor;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,7 @@ public class MainController {
 
     @GetMapping("/")
     public String home(Model model) {
-        int cartItemCount = cart.getCart().stream()
+        int cartItemCount = cart.getItemDtoList().stream()
                 .mapToInt(ItemDto::getQuantity)
                 .sum();
         model.addAttribute("cartItemCount", cartItemCount);
@@ -43,7 +42,7 @@ public class MainController {
 
     @GetMapping("/account")
     public String account(Model model) {
-        int cartItemCount = cart.getCart().stream()
+        int cartItemCount = cart.getItemDtoList().stream()
                 .mapToInt(ItemDto::getQuantity)
                 .sum();
         model.addAttribute("cartItemCount", cartItemCount);
