@@ -63,7 +63,6 @@
 </head>
 <body>
 <div th:insert="header.html :: header"></div>
-
 <div class="container">
     <div th:if="${message}" class="alert alert-warning">
         <p th:text="${message}"></p>
@@ -80,7 +79,6 @@
     </div>
     <input type="email" name="username" placeholder="E-mail address"><br>
     <input type="password" name="password" placeholder="Password"><br>
-<!--      <input type="hidden" name="_csrf" value="${_csrf.token}">-->
     <button type="submit">Log in</button>
     <div class="text-center">
       <p><a href="login/register">Create an account</a></p>

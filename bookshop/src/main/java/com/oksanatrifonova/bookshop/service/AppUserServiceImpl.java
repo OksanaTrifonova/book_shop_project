@@ -4,6 +4,7 @@ import com.oksanatrifonova.bookshop.dto.AppUserDetails;
 import com.oksanatrifonova.bookshop.dto.AppUserDto;
 import com.oksanatrifonova.bookshop.entity.AppUser;
 import com.oksanatrifonova.bookshop.entity.Role;
+import com.oksanatrifonova.bookshop.exception.BookValidationException;
 import com.oksanatrifonova.bookshop.mapper.AppUserMapper;
 import com.oksanatrifonova.bookshop.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
 
     private static final String USER_NOT_FOUND_MSG = "User not found";
+    private static final String SAME_EMAIL_MSG = "There is already an account registered with the same email";
+    private static final String LAST_ADMIN_MSG = "Cannot delete the last active Admin user";
     private final AppUserRepository userRepository;
     private final AppUserMapper userMapper;
     @Autowired
@@ -40,7 +42,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     public AppUser findUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND_MSG));
+                .orElseThrow(() -> new BookValidationException(USER_NOT_FOUND_MSG));
     }
 
     public void updateUserRole(Long id, String newRole) {
@@ -48,14 +50,14 @@ public class AppUserServiceImpl implements AppUserService {
             user.setRole(Role.valueOf(newRole));
             userRepository.save(user);
         }, () -> {
-            throw new IllegalArgumentException(USER_NOT_FOUND_MSG);
+            throw new BookValidationException(USER_NOT_FOUND_MSG);
         });
     }
 
 
     public void registerUser(AppUserDto userDto) {
         if (emailExists(userDto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists: " + userDto.getEmail());
+            throw new BookValidationException(SAME_EMAIL_MSG);
         }
         AppUser user = userMapper.mapToUser(userDto);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -76,7 +78,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     public void addUser(AppUserDto userDto) {
         if (emailExists(userDto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists: " + userDto.getEmail());
+            throw new BookValidationException(SAME_EMAIL_MSG);
         }
         AppUser user = userMapper.mapToUser(userDto);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -92,7 +94,7 @@ public class AppUserServiceImpl implements AppUserService {
         if (user.getRole().equals(Role.ADMIN)) {
             long adminCount = userRepository.countByRoleAndActive(Role.ADMIN, true);
             if (adminCount <= 1) {
-                throw new IllegalArgumentException("Cannot delete the last active Admin user");
+                throw new BookValidationException(LAST_ADMIN_MSG);
             }
         }
         user.setActive(false);
@@ -104,7 +106,7 @@ public class AppUserServiceImpl implements AppUserService {
         return userRepository.findByActive(true)
                 .stream()
                 .map(userMapper::mapToUserDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 

@@ -61,17 +61,28 @@
         border: none;
         cursor: pointer;
     }
+    .alert{
+    color: red;
+    }
+
     </style>
 </head>
 <body>
 <div class="container">
     <div class="row col-md-10">
-        <h2>List of registered users</h2>
+        <h2>List of registered users</h2><br>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <p th:text="${error}"></p>
+        </div>
     </div>
     <table>
         <thead>
         <thead>
     <tr>
+        <div th:if="${message}" class="alert alert-warning">
+            <p th:text="${message}"></p>
+        </div>
+
         <th>First name</th>
         <th>Last name</th>
         <th>Email</th>

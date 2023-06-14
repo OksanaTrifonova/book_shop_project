@@ -11,10 +11,18 @@ public class BookAuthorMapper {
         BookAuthorDto dto = new BookAuthorDto();
         dto.setId(bookAuthor.getId());
         dto.setName(bookAuthor.getName());
-        dto.setBirthYear(bookAuthor.getBirthYear());
-        dto.setDeathYear(bookAuthor.getDeathYear());
+        dto.setBirthYear(formatYear(bookAuthor.getBirthYear()));
+        dto.setDeathYear(formatYear(bookAuthor.getDeathYear()));
         dto.setActive(bookAuthor.isActive());
         return dto;
     }
-
+    private String formatYear(Integer year) {
+        if (year == null) {
+            return null;
+        } else if (year < 0) {
+            return Math.abs(year) + " BC";
+        } else {
+            return year.toString();
+        }
+    }
 }

@@ -59,12 +59,12 @@
         <th>Books</th>
     </tr>
 
-    <tr th:each="orderDto : ${orderDetailsList}">
-        <td th:text="${#temporals.format(orderDto.orderDateTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
-        <td th:text="'$'+${orderDto.totalAmount}"> </td>
+    <tr th:each="order : ${orderDetailsList}">
+        <td th:text="${#temporals.format(order.orderDateTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="'$'+${order.totalAmount}"> </td>
 
         <td>
-            <a th:href="@{'/account/order/' + ${orderDto.id}}">View Details</a>
+            <a th:href="@{'/account/order/' + ${order.id}}">View Details</a>
         </td>
     </tr>
 </table>

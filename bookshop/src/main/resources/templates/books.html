@@ -4,21 +4,20 @@
     <meta charset="UTF-8">
     <title>Books</title>
     <style>
-      body {
+        body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
         }
 
-         header {
-            background-color: 	#808080;
+        header {
+            background-color: #808080;
             color: #fff;
             padding: 10px;
         }
 
-
         nav {
-            background-color: 	#808080;
+            background-color: #808080;
             padding: 10px;
         }
 
@@ -38,34 +37,36 @@
             text-decoration: none;
             padding: 5px;
         }
-         nav ul li a:hover {
-        text-decoration: underline;
-    }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding-bottom: 80px;
-            padding-top: 10px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-gap: 20px;
-            text-align: center;
-
-        }
-    .btn {
-        display: flex;
-        justify-content: center;
-        padding: 5px 10px;
-        background-color: #000080;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        margin-right: 10px;
-        width: 90px;
-        font-size: 15px;
+        max-width: 900px;
+        margin: 0 auto;
+        padding-bottom: 150px; /* Добавьте отступ вниз */
+        padding-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 20px;
         text-align: center;
     }
+
+
+        .btn {
+            display: flex;
+            justify-content: center;
+            padding: 5px 10px;
+            background-color: #000080;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 90px;
+            font-size: 15px;
+            text-align: center;
+        }
 
         .book {
             background-color: #f0f0f0;
@@ -81,27 +82,27 @@
             margin-bottom: 5px;
         }
 
-
         .top-right {
             position: absolute;
             top: 0;
             right: 0;
         }
-        .book-image{
-        height:250px;
-        width: 150px;
-        vertical-align: top;
+
+        .book-image {
+            height: 250px;
+            width: 150px;
+            vertical-align: top;
         }
 
-    .btn-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
-        text-align: center;
-    }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            text-align: center;
+        }
 
-      footer {
-            background-color: 	#808080;
+        footer {
+            background-color: #808080;
             color: #fff;
             padding: 5px;
             text-align: center;
@@ -110,15 +111,16 @@
             bottom: 0;
             width: 100%;
         }
-         .top-right {
-        position: absolute;
-        top: 50%;
 
-        transform: translate(-50%, -50%);
-        text-align: right;
-    }
+        .top-right {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: right;
+        }
 
-         .add-book-link {
+        .add-book-link {
             display: inline-block;
             padding: 6px 12px;
             background-color: #000080;
@@ -127,29 +129,21 @@
             border-radius: 4px;
             margin-top: 10px;
             margin-right: 45px;
+        }
 
-    }
-         .add-book-link:hover {
-         text-decoration: underline;
-         }
-     a {
+        .add-book-link:hover {
+            text-decoration: underline;
+        }
+
+        a {
             text-decoration: none;
-
         }
 
         a:hover {
             text-decoration: underline;
         }
 
-    .top-right .back-link {
-        display: block;
-        color: #000;
-        text-decoration: none;
-    }
-   .top-right .back-link:hover {
-   text-decoration: underline;}
-
-    .sidebar {
+        .sidebar {
             float: left;
             width: 20%;
             padding: 10px;
@@ -159,70 +153,123 @@
 
         .sidebar ul {
             list-style-type: none;
-             padding: 0;
-             margin: 0;
-             margin-right: 20px;
+            padding: 0;
+            margin: 0;
+            margin-right: 20px;
         }
 
         .sidebar ul li {
             margin-bottom: 5px;
             margin-left: 100px;
         }
+        .sidebar ul li a {
+        color: #000080;
+        text-decoration: none;
+        padding: 5px;
+    }
+        .sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+
         .books {
             float: right;
             width: 80%;
-            }
+        }
+
+       .pagination {
+        margin-top: 10px;
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        clear: both;
+    }
+
+
+        .pagination a,
+        .pagination span {
+            padding: 5px 10px;
+            margin: 0 2px;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .pagination a:hover {
+            background-color: #ccc;
+        }
+
+        .pagination .active {
+            background-color: #000080;
+            color: #fff;
+        }
     </style>
-    </head>
-    <body>
-    <div th:insert="header.html :: header"></div>
+</head>
 
-    <div class="sidebar">
-        <form th:action="@{/books}" method="get">
-            <label for="author">Select author:</label>
-            <select id="author" name="authorId">
-                <option value="">All authors</option>
-                <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
-            </select>
-            <button type="submit">Filter</button>
-        </form>
-        <ul>
-            <li><a th:href="@{/books}">All Categories</a></li>
-            <li th:each="category : ${categories}">
-                <a th:href="@{/books/category/{category}(category=${category})}" th:text="${category}"></a>
-            </li>
+<body>
+<div th:insert="header.html :: header"></div>
 
-        </ul>
-        <div sec:authorize="hasRole('ADMIN') or hasRole('MANAGER')">
-            <a th:href="@{/book/add}" class="add-book-link">Add new book</a><br><br><br>
+<div class="sidebar">
+    <form th:action="@{/books}" method="get">
+        <label for="author">Select author:</label>
+        <select id="author" name="authorId">
+            <option value="">All AUTHORS</option>
+            <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
+        </select>
+        <button type="submit">Filter</button>
+    </form><br><br>
+    <ul>
+        <li><a th:href="@{/books}">All CATEGORIES</a></li>
+        <li th:each="category : ${categories}">
+            <a th:href="@{/books/category/{category}(category=${category})}" th:text="${category}"></a>
+        </li>
+    </ul>
+    <div sec:authorize="hasRole('ADMIN') or hasRole('MANAGER')">
+        <a th:href="@{/book/add}" class="add-book-link">Add new book</a><br><br><br>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div th:each="book: ${books}" class="book">
+        <img th:src="@{/images/{id}(id=${book.imageId})}" alt="Book Image" class="book-image" src="">
+        <h4>
+            <a th:href="@{'/book/' + ${book.id}}">
+                <span th:text="${book.title}"></span>
+            </a>
+        </h4>
+        <p>
+            Author(s):
+            <span th:each="authorName, iterStat : ${book.authorNames}">
+                    <span th:text="${authorName}"></span>
+                    <span th:if="${!iterStat.last}">, </span>
+                </span>
+        </p>
+        <p>Price: $<span th:text="${book.price}"></span></p>
+        <div class="btn-container" sec:authorize="!hasRole('ADMIN')">
+            <a th:href="'/book/' + ${book.id} + '/cart'" class="btn btn-warning">Add to cart</a>
         </div>
     </div>
+</div>
 
-            <div class="container mt-5">
+<div class="pagination" style="margin-top: 5px;">
+        <span th:if="${hasPreviousPage}">
+            <a th:href="@{|/books?page=${currentPage - 1}|}">&laquo; Previous</a>
+        </span>
+    <span th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{|/books?page=${pageNumber}|}"
+               th:class="${pageNumber == currentPage ? 'active' : ''}"
+               th:text="${pageNumber + 1}"></a>
+        </span>
+    <span th:if="${hasNextPage}">
+            <a th:href="@{|/books?page=${currentPage + 1}|}">Next &raquo;</a>
+        </span>
+</div>
+<!--<footer>-->
+<!--    <p>&copy; 2023 Bookstore. All rights reserved.</p>-->
+<!--</footer>-->
 
-            <div th:each="book: ${books}" class="book">
+<!--<div th:insert="footer.html :: footer"></div>-->
+</body>
 
-                <img th:src="@{/images/{id}(id=${book.imageId})}" alt="Book Image" class="book-image" src="">
-                <h4>
-                    <a th:href="@{'/book/' + ${book.id}}">
-                        <span th:text="${book.title}"></span>
-                    </a>
-                </h4>
-                <p>Author(s):
-                    <span th:each="authorName, iterStat : ${book.authorNames}">
-            <span th:text="${authorName}"></span>
-            <span th:if="${!iterStat.last}">, </span>
-              </span>
-                </p>
-                <p>Price: $<span th:text="${book.price}"></span></p>
-                <div class="btn-container" sec:authorize="!hasRole('ADMIN')">
-                    <a th:href="'/book/' + ${book.id} + '/cart'" class="btn btn-warning">Add to cart</a>
-                </div>
+</html>
 
-            </div>
-           </div>
-
-        <div th:insert="footer.html :: footer"></div>
-
-        </body>
-        </html>

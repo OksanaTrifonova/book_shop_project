@@ -52,6 +52,9 @@
          color: red;
          text-align:center;
 }
+   .alert{
+         color: red;
+    }
 
     </style>
 </head>
@@ -68,6 +71,9 @@
       <select id="authorIds" name="authorIds" class="form-control" multiple="multiple" required oninvalid="this.setCustomValidity('At least one author must be selected')" oninput="this.setCustomValidity('')">
         <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}" th:selected="${book.authorIds.contains(author.id)}"></option>
       </select>
+    </div>
+    <div th:if="${error}" class="alert alert-danger" role="alert">
+      <p th:text="${error}"></p>
     </div>
     <span th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger error-text"></span><br>
     <input type="text" id="price" name="price" placeholder="Add book price" class="form-control"

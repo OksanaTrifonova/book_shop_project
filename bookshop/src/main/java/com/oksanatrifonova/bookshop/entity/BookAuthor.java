@@ -27,6 +27,7 @@ public class BookAuthor {
     private Long id;
     @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private Integer birthYear;
     private Integer deathYear;
 

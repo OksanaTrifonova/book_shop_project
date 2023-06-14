@@ -5,7 +5,6 @@ import com.oksanatrifonova.bookshop.entity.Item;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class ItemMapper {
@@ -28,13 +27,13 @@ public class ItemMapper {
     public List<Item> convertToEntityList(List<ItemDto> itemDTOList) {
         return itemDTOList.stream()
                 .map(this::convertToEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<ItemDto> convertToDtoList(List<Item> itemList) {
         return itemList.stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                .toList();
 
     }
 }

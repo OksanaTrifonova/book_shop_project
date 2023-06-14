@@ -44,14 +44,17 @@
   <table>
 
     <tr th:each="book : ${books}">
-      <h4>
-        <a th:href="@{'/book/' + ${book.id}}">
-          <span th:text="${book.title}"></span>
-        </a>
-        <p th:text="${book.category}"></p>
-      </h4>
-      <img th:src="@{/images/{id}(id=${book.imageId})}" alt="Book Image" class="book-image" src="">
+      <td>
+        <h4>
+          <a th:href="@{'/book/' + ${book.id}}">
+            <span th:text="${book.title}"></span>
+          </a>
+          <p th:text="${book.category}"></p>
+        </h4>
+        <img th:src="@{/images/{id}(id=${book.imageId})}" alt="Book Image" class="book-image" src="">
+      </td>
     </tr>
+
 
   </table>
 </div>

@@ -4,24 +4,22 @@ import com.oksanatrifonova.bookshop.dto.BookDto;
 import com.oksanatrifonova.bookshop.dto.ItemDto;
 import com.oksanatrifonova.bookshop.entity.Book;
 import com.oksanatrifonova.bookshop.mapper.BookMapper;
+import com.oksanatrifonova.bookshop.service.BookService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Component
-
+@AllArgsConstructor
 public class Cart {
     private final BookMapper bookMapper;
+    private final BookService bookService;
     private final List<ItemDto> itemDtoList;
 
-    public Cart(BookMapper bookMapper) {
-        this.bookMapper = bookMapper;
-        this.itemDtoList = new ArrayList<>();
-    }
 
     public List<ItemDto> getItemDtoList() {
         return itemDtoList;
@@ -48,6 +46,14 @@ public class Cart {
         }
     }
 
+    public void addToCart(Long bookId) {
+        BookDto book = bookService.getBookById(bookId);
+        if (book != null) {
+            addItemToCart(book, 1, book.getPrice());
+            calculateTotalAmount();
+        }
+    }
+
     public void update(Long id, int quantity) {
         Optional<ItemDto> optionalItem = itemDtoList.stream()
                 .filter(item -> item.getBook().getId().equals(id))
@@ -56,14 +62,16 @@ public class Cart {
     }
 
     public BigDecimal calculateTotalAmount() {
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (ItemDto item : itemDtoList) {
-            BigDecimal itemPrice = item.getBook().getPrice();
-            int itemQuantity = item.getQuantity();
-            BigDecimal itemTotal = itemPrice.multiply(BigDecimal.valueOf(itemQuantity));
-            totalAmount = totalAmount.add(itemTotal);
-        }
-        return totalAmount;
+        return itemDtoList.stream()
+                .map(item -> item.getBook().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public int getItemCount() {
+        return itemDtoList.stream()
+                .mapToInt(ItemDto::getQuantity)
+                .sum();
+    }
+
 
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
+
 
 @Getter
 @Setter
@@ -13,10 +13,8 @@ import javax.persistence.Column;
 @AllArgsConstructor
 public class BookAuthorDto {
     private Long id;
-    @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
-    private Integer birthYear;
-    private Integer deathYear;
+    private String birthYear;
+    private String deathYear;
     private boolean active;
 }

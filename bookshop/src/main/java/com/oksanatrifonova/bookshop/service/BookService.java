@@ -5,17 +5,19 @@ import com.oksanatrifonova.bookshop.entity.Book;
 import com.oksanatrifonova.bookshop.entity.BookAuthor;
 import com.oksanatrifonova.bookshop.entity.Category;
 import com.oksanatrifonova.bookshop.entity.Image;
+import com.oksanatrifonova.bookshop.exception.BookValidationException;
 import com.oksanatrifonova.bookshop.mapper.BookMapper;
 import com.oksanatrifonova.bookshop.repository.BookAuthorRepository;
 import com.oksanatrifonova.bookshop.repository.BookRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,55 +25,74 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class BookService {
+    private static final String INVALID_ID_MSG = "Invalid author ID: ";
+    private static final String IMAGE_SIZE_MSG = "Image size exceeds the maximum allowed size";
+    private static final String TITLE_MSG = "Title is required";
+    private static final String PRICE_MSG = "Price is required";
+    private static final String PRICE_VALIDATION_MSG = "Price must be greater than 0";
+    private static final String DESCRIPTION_MSG = "Description is required";
+
     private final BookRepository bookRepository;
     private final BookAuthorRepository bookAuthorRepository;
     private final BookMapper bookMapper;
 
-
-    public List<BookDto> listAllActiveBooks() {
-        return bookRepository.findByActive(true)
-                .stream()
-                .map(bookMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<BookDto> getBooksByFilter(String filterButton, Long authorId, Pageable pageable) {
+        if (filterButton != null && filterButton.equals("All")) {
+            return listAllActiveBooks(pageable);
+        } else if (authorId != null) {
+            return findBooksByAuthor(authorId, pageable);
+        } else {
+            return listAllActiveBooks(pageable);
+        }
     }
 
-    public List<BookDto> findBooksByCategory(Category category) {
-        return bookRepository.findBooksByCategoryAndActive(category, true)
-                .stream()
-                .map(bookMapper::toDto)
-                .collect(Collectors.toList());
-
+    public Page<BookDto> listAllActiveBooks(Pageable pageable) {
+        return bookRepository.findByActive(true, pageable)
+                .map(bookMapper::toDto);
     }
 
-    public List<BookDto> findBooksByAuthor(Long authorId) {
+    public Page<BookDto> findBooksByAuthor(Long authorId, Pageable pageable) {
         return bookAuthorRepository.findById(authorId)
-                .map(author -> bookRepository.findBooksByAuthorsAndActive(author, true)
-                        .stream()
-                        .map(bookMapper::toDto)
-                        .collect(Collectors.toList()))
-                .orElse(Collections.emptyList());
+                .map(author -> bookRepository.findBooksByAuthorsAndActive(author, true, pageable))
+                .orElse(Page.empty())
+                .map(bookMapper::toDto);
     }
+
+    public List<BookDto> findBooksByAuthorFor(Long authorId) {
+        BookAuthor author = bookAuthorRepository.findById(authorId)
+                .orElseThrow(() -> new BookValidationException(INVALID_ID_MSG + authorId));
+
+        List<Book> books = bookRepository.findAllByAuthors(author);
+        return books.stream()
+                .map(bookMapper::toDto)
+                .toList();
+    }
+
+
+    public Page<BookDto> findBooksByCategory(Category category, Pageable pageable) {
+        Page<Book> bookPage = bookRepository.findBooksByCategoryAndActive(category, true, pageable);
+        return bookPage.map(bookMapper::toDto);
+    }
+
 
     public Set<BookAuthor> mapAuthorIdsToAuthors(List<Long> authorIds) {
-        Set<BookAuthor> authors = new HashSet<>();
-        for (Long authorId : authorIds) {
-            BookAuthor author = bookAuthorRepository.findById(authorId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid author ID: " + authorId));
-            authors.add(author);
-        }
-        return authors;
+        return authorIds.stream()
+                .map(authorId -> bookAuthorRepository.findById(authorId)
+                        .orElseThrow(() -> new BookValidationException(INVALID_ID_MSG + authorId)))
+                .collect(Collectors.toSet());
     }
 
 
     @Transactional
-    public void saveBook(BookDto bookDto, MultipartFile file) throws IOException {
+    public void saveBook(BookDto bookDto, MultipartFile file) throws BookValidationException, IOException {
+        validateBook(bookDto);
         Book book = bookMapper.toEntity(bookDto);
         book.setActive(true);
 
         Image image;
         if (!file.isEmpty()) {
             if (file.getSize() >= 65535) {
-                throw new IllegalArgumentException("Image size exceeds the maximum allowed size");
+                throw new BookValidationException(IMAGE_SIZE_MSG);
             }
             image = toImageEntity(file);
             book.addImageToBook(image);
@@ -79,6 +100,22 @@ public class BookService {
         book.setAuthors(mapAuthorIdsToAuthors(bookDto.getAuthorIds()));
 
         bookRepository.save(book);
+    }
+
+    private void validateBook(BookDto bookDto) {
+        if (bookDto.getTitle() == null || bookDto.getTitle().isEmpty()) {
+            throw new BookValidationException(TITLE_MSG);
+        }
+        if (bookDto.getPrice() == null) {
+            throw new BookValidationException(PRICE_MSG);
+        }
+        if (bookDto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BookValidationException(PRICE_VALIDATION_MSG);
+        }
+
+        if (bookDto.getDescription() == null || bookDto.getDescription().isEmpty()) {
+            throw new BookValidationException(DESCRIPTION_MSG);
+        }
     }
 
 
@@ -93,6 +130,7 @@ public class BookService {
     }
 
     public void updateBookWithImage(BookDto updatedBookDto, MultipartFile file) throws IOException {
+        validateBook(updatedBookDto);
         Book book = bookRepository.findById(updatedBookDto.getId()).orElse(null);
         if (book != null) {
             if (!file.isEmpty()) {
@@ -109,7 +147,7 @@ public class BookService {
                         book.setImages(updatedImage);
                     }
                 } else {
-                    throw new IllegalArgumentException("Image size exceeds the maximum allowed size");
+                    throw new IllegalArgumentException(IMAGE_SIZE_MSG);
                 }
             }
             book.setTitle(updatedBookDto.getTitle());

@@ -48,6 +48,9 @@
             margin-top: 20px;
             text-align: center;
         }
+         .alert{
+         color: red;
+    }
     </style>
   <div class="container mt-5">
     <h1>Edit a book</h1>
@@ -64,6 +67,9 @@
           <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"
                   th:selected="${book.authorIds.contains(author.id)}"></option>
         </select><br><br>
+      </div>
+      <div th:if="${error}" class="alert alert-danger" role="alert">
+        <p th:text="${error}"></p>
       </div>
 
       <input type="text" th:value="${book.price}" name="price" placeholder="Add book price" class="form-control"

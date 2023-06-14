@@ -2,10 +2,7 @@ package com.oksanatrifonova.bookshop.controller;
 
 import com.oksanatrifonova.bookshop.component.Cart;
 import com.oksanatrifonova.bookshop.dto.BookAuthorDto;
-import com.oksanatrifonova.bookshop.dto.BookDto;
-import com.oksanatrifonova.bookshop.dto.ItemDto;
-import com.oksanatrifonova.bookshop.service.BookAuthorService;
-import com.oksanatrifonova.bookshop.service.BookService;
+import com.oksanatrifonova.bookshop.service.AuthorService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,43 +18,39 @@ import java.util.List;
 @AllArgsConstructor
 public class CartController {
     private static final String REDIRECT_TO_CART = "redirect:/cart";
-    private BookService bookService;
+    private static final String REDIRECT_TO_BOOKS = "redirect:/books";
+    private static final String CART_ITEM = "cartItemCount";
+    private static final String TOTAL_AMOUNT = "totalAmount";
+    private static final String CART_TEMPLATE = "cart";
+    private static final String AUTHORS = "authors";
+
     private Cart cart;
-    private final BookAuthorService bookAuthorService;
+    private final AuthorService bookAuthorService;
 
 
     @GetMapping("/cart")
     public String viewCart(Model model) {
-        int cartItemCount = cart.getItemDtoList().stream()
-                .mapToInt(ItemDto::getQuantity)
-                .sum();
-        model.addAttribute("cartItemCount", cartItemCount);
+        int cartItemCount = cart.getItemCount();
+        model.addAttribute(CART_ITEM, cartItemCount);
         List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
         BigDecimal totalAmount = cart.calculateTotalAmount();
-        model.addAttribute("totalAmount", totalAmount.toString());
-        model.addAttribute("cart", cart.getItemDtoList());
-        model.addAttribute("authors", authors);
-        return "cart";
+        model.addAttribute(TOTAL_AMOUNT, totalAmount.toString());
+        model.addAttribute(CART_TEMPLATE, cart.getItemDtoList());
+        model.addAttribute(AUTHORS, authors);
+        return CART_TEMPLATE;
     }
 
     @GetMapping("/book/{id}/cart")
     public String addToCart(@PathVariable("id") Long id, Model model) {
-        BookDto book = bookService.getBookById(id);
-        if (book != null) {
-            cart.addItemToCart(book, 1, book.getPrice());
-            cart.calculateTotalAmount();
-            int cartItemCount = cart.getItemDtoList().stream()
-                    .mapToInt(ItemDto::getQuantity)
-                    .sum();
-            model.addAttribute("cartItemCount", cartItemCount);
-        }
-        return "redirect:/books";
+        cart.addToCart(id);
+        int cartItemCount = cart.getItemCount();
+        model.addAttribute(CART_ITEM, cartItemCount);
+        return REDIRECT_TO_BOOKS;
     }
 
     @PostMapping("/cart/remove/{id}")
     public String removeItemById(@PathVariable("id") Long id) {
         cart.removeItemById(id);
-
         return REDIRECT_TO_CART;
     }
 
