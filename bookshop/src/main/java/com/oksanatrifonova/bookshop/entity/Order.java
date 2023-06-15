@@ -23,7 +23,7 @@ import java.util.List;
 @Setter
 @Getter
 @Table(name = "book_order")
-public class BookOrder {
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -40,10 +40,10 @@ public class BookOrder {
     private BigDecimal totalAmount;
     private LocalDateTime orderDateTime;
 
-    public BookOrder() {
+    public Order() {
     }
 
-    public BookOrder(AppUser user, List<Item> items) {
+    public Order(AppUser user, List<Item> items) {
         this.user = user;
         this.items = items;
     }

@@ -1,15 +1,14 @@
 package com.oksanatrifonova.bookshop.service;
 
-import com.oksanatrifonova.bookshop.dto.BookAuthorDto;
-import com.oksanatrifonova.bookshop.entity.BookAuthor;
-import com.oksanatrifonova.bookshop.exception.BookValidationException;
-import com.oksanatrifonova.bookshop.mapper.BookAuthorMapper;
-import com.oksanatrifonova.bookshop.repository.BookAuthorRepository;
+import com.oksanatrifonova.bookshop.dto.AuthorDto;
+import com.oksanatrifonova.bookshop.entity.Author;
+import com.oksanatrifonova.bookshop.exception.BookshopException;
+import com.oksanatrifonova.bookshop.mapper.AuthorMapper;
+import com.oksanatrifonova.bookshop.repository.AuthorRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
-import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -17,54 +16,48 @@ import java.util.List;
 public class AuthorService {
     private static final String AUTHOR_NOT_FOUND_MSG = "Author not found";
     private static final String WRONG_DEATH_YEAR_MSG = "Death year cannot be before birth year.";
-    private static final String WRONG_BIRTH_YEAR_MSG ="Birth year cannot be in the future.";
-    private static final String WRONG_DEATH_YEAR_FUTURE_MSG ="Death year cannot be in the future.";
-    private final BookAuthorRepository bookAuthorRepository;
-    private final BookAuthorMapper bookAuthorMapper;
+    private static final String WRONG_BIRTH_YEAR_MSG = "Birth year cannot be in the future.";
+    private static final String WRONG_DEATH_YEAR_FUTURE_MSG = "Death year cannot be in the future.";
+    private final AuthorRepository authorRepository;
+    private final AuthorMapper authorMapper;
 
-
-    public void createBookAuthor(BookAuthorDto author) {
-        Integer birthYear = parseYear(author.getBirthYear());
-        Integer deathYear = parseYear(author.getDeathYear());
-
+    public void addAuthor(AuthorDto authorDto) {
+        Integer birthYear = parseYear(authorDto.getBirthYear());
+        Integer deathYear = parseYear(authorDto.getDeathYear());
         validateBirthAndDeathYears(birthYear, deathYear);
-
-        BookAuthor bookAuthor = new BookAuthor(author.getName(), birthYear, deathYear);
-        bookAuthor.setActive(true);
-        bookAuthor = bookAuthorRepository.save(bookAuthor);
-        bookAuthorMapper.toDto(bookAuthor);
+        Author author = new Author(authorDto.getName(), birthYear, deathYear);
+        author.setActive(true);
+        author = authorRepository.save(author);
+        authorMapper.toDto(author);
     }
 
-    public void editBookAuthor(Long authorId, BookAuthorDto author) {
-        BookAuthor bookAuthor = bookAuthorRepository.findById(authorId)
+    public void editAuthor(Long authorId, AuthorDto authorDto) {
+        Author author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new IllegalArgumentException(AUTHOR_NOT_FOUND_MSG));
-        Integer birthYear = parseYear(author.getBirthYear());
-        Integer deathYear = parseYear(author.getDeathYear());
-
+        Integer birthYear = parseYear(authorDto.getBirthYear());
+        Integer deathYear = parseYear(authorDto.getDeathYear());
         validateBirthAndDeathYears(birthYear, deathYear);
-
-        bookAuthor.setName(author.getName());
-        bookAuthor.setBirthYear(birthYear);
-        bookAuthor.setDeathYear(deathYear);
-        bookAuthor.setActive(true);
-        bookAuthorRepository.save(bookAuthor);
+        author.setName(authorDto.getName());
+        author.setBirthYear(birthYear);
+        author.setDeathYear(deathYear);
+        author.setActive(true);
+        authorRepository.save(author);
     }
 
     private void validateBirthAndDeathYears(Integer birthYear, Integer deathYear) {
         if (birthYear != null && deathYear != null && deathYear < birthYear) {
-            throw new BookValidationException(WRONG_DEATH_YEAR_MSG);
+            throw new BookshopException(WRONG_DEATH_YEAR_MSG);
         }
 
         if (birthYear != null && birthYear > Year.now().getValue()) {
-            throw new BookValidationException(WRONG_BIRTH_YEAR_MSG);
+            throw new BookshopException(WRONG_BIRTH_YEAR_MSG);
         }
 
-        if (deathYear != null && deathYear > YearMonth.now().getYear()) {
-            throw new BookValidationException(WRONG_DEATH_YEAR_FUTURE_MSG);
+        if (deathYear != null && deathYear > Year.now().plusYears(1).getValue()) {
+            throw new BookshopException(WRONG_DEATH_YEAR_FUTURE_MSG);
         }
 
     }
-
 
     private Integer parseYear(String yearString) {
         if (yearString == null || yearString.isBlank()) {
@@ -77,23 +70,23 @@ public class AuthorService {
         }
     }
 
-    public void deleteBookAuthor(Long id) {
-        BookAuthor bookAuthor = bookAuthorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(AUTHOR_NOT_FOUND_MSG));
+    public void deleteAuthor(Long id) {
+        Author bookAuthor = authorRepository.findById(id)
+                .orElseThrow(() -> new BookshopException(AUTHOR_NOT_FOUND_MSG));
         bookAuthor.setActive(false);
-        bookAuthorRepository.save(bookAuthor);
+        authorRepository.save(bookAuthor);
     }
 
-    public List<BookAuthorDto> getAllBookAuthors() {
-        List<BookAuthor> bookAuthors = bookAuthorRepository.findByActive(true);
+    public List<AuthorDto> getAllBookAuthors() {
+        List<Author> bookAuthors = authorRepository.findByActive(true);
         return bookAuthors.stream()
-                .map(bookAuthorMapper::toDto)
+                .map(authorMapper::toDto)
                 .toList();
     }
 
-    public BookAuthorDto getAuthorById(Long id) {
-        BookAuthor author = bookAuthorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(AUTHOR_NOT_FOUND_MSG));
-        return bookAuthorMapper.toDto(author);
+    public AuthorDto getAuthorById(Long id) {
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new BookshopException(AUTHOR_NOT_FOUND_MSG));
+        return authorMapper.toDto(author);
     }
 }

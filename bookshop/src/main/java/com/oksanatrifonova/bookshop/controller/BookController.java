@@ -1,14 +1,12 @@
 package com.oksanatrifonova.bookshop.controller;
 
 import com.oksanatrifonova.bookshop.component.Cart;
-import com.oksanatrifonova.bookshop.dto.BookAuthorDto;
 import com.oksanatrifonova.bookshop.dto.BookDto;
 import com.oksanatrifonova.bookshop.entity.Category;
-import com.oksanatrifonova.bookshop.exception.BookValidationException;
+import com.oksanatrifonova.bookshop.exception.BookshopException;
 import com.oksanatrifonova.bookshop.service.AuthorService;
 import com.oksanatrifonova.bookshop.service.BookService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -22,9 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -47,8 +42,7 @@ public class BookController {
 
     private final BookService bookService;
     private final Cart cart;
-    private final AuthorService bookAuthorService;
-
+    private final AuthorService authorService;
 
     @GetMapping("/books")
     public String bookMain(@RequestParam(name = "filterButton", required = false) String filterButton,
@@ -56,21 +50,14 @@ public class BookController {
                            @RequestParam(defaultValue = "0") int page,
                            Model model) {
         PageRequest pageRequest = PageRequest.of(page, 6);
-        List<Category> categories = Arrays.asList(Category.values());
-        model.addAttribute(CATEGORIES, categories);
-        int cartItemCount = cart.getItemCount();
-        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
-
-        Page<BookDto> bookPage = bookService.getBooksByFilter(filterButton, authorId, pageRequest);
-        List<BookDto> books = bookPage.getContent();
-        model.addAttribute(BOOKS, books);
+        model.addAttribute(CATEGORIES, bookService.getAllCategoryNames());
+        model.addAttribute(CART_ITEM_COUNT, cart.getItemCount());
+        model.addAttribute(BOOKS, bookService.getBooksByFilter(filterButton, authorId, pageRequest).getContent());
         model.addAttribute(CURRENT_PAGE, page);
-        model.addAttribute(TOTAL_PAGES, bookPage.getTotalPages());
-        model.addAttribute(PREVIOUS_PAGE, bookPage.hasPrevious());
-        model.addAttribute(NEXT_PAGE, bookPage.hasNext());
-        List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-        model.addAttribute(AUTHORS, authors);
-
+        model.addAttribute(TOTAL_PAGES, bookService.getBooksByFilter(filterButton, authorId, pageRequest).getTotalPages());
+        model.addAttribute(PREVIOUS_PAGE, bookService.getBooksByFilter(filterButton, authorId, pageRequest).hasPrevious());
+        model.addAttribute(NEXT_PAGE, bookService.getBooksByFilter(filterButton, authorId, pageRequest).hasNext());
+        model.addAttribute(AUTHORS, authorService.getAllBookAuthors());
         return BOOKS;
     }
 
@@ -78,29 +65,21 @@ public class BookController {
     public String getBooksByCategories(@PathVariable Category category,
                                        @RequestParam(value = "page", defaultValue = "0") int page,
                                        Model model) {
-        int cartItemCount = cart.getItemCount();
-        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
-
         Pageable pageable = PageRequest.of(page, 6);
-        Page<BookDto> bookPage = bookService.findBooksByCategory(category, pageable);
-
-        model.addAttribute(BOOKS, bookPage.getContent());
-        model.addAttribute(CATEGORIES, Arrays.asList(Category.values()));
-        model.addAttribute(CURRENT_PAGE, bookPage.getNumber());
-        model.addAttribute(TOTAL_PAGES, bookPage.getTotalPages());
-        model.addAttribute(PREVIOUS_PAGE, bookPage.hasPrevious());
-        model.addAttribute(NEXT_PAGE, bookPage.hasNext());
-
+        model.addAttribute(CART_ITEM_COUNT, cart.getItemCount());
+        model.addAttribute(BOOKS, bookService.findBooksByCategory(category, pageable).getContent());
+        model.addAttribute(CATEGORIES, bookService.getAllCategoryNames());
+        model.addAttribute(CURRENT_PAGE, bookService.findBooksByCategory(category, pageable).getNumber());
+        model.addAttribute(TOTAL_PAGES, bookService.findBooksByCategory(category, pageable).getTotalPages());
+        model.addAttribute(PREVIOUS_PAGE, bookService.findBooksByCategory(category, pageable).hasPrevious());
+        model.addAttribute(NEXT_PAGE, bookService.findBooksByCategory(category, pageable).hasNext());
         return BOOKS;
     }
 
     @GetMapping("/book/add")
     public String bookAddForm(Model model) {
-        List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-        BookDto bookDto = new BookDto();
-        model.addAttribute(BOOK, bookDto);
-        bookDto.setAuthorIds(new ArrayList<>());
-        model.addAttribute(AUTHORS, authors);
+        model.addAttribute(BOOK, new BookDto());
+        model.addAttribute(AUTHORS, authorService.getAllBookAuthors());
         return BOOK_ADD;
     }
 
@@ -110,24 +89,19 @@ public class BookController {
         try {
             bookService.saveBook(bookDto, file);
             return REDIRECT_BOOKS;
-        } catch (BookValidationException e) {
-            List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
+        } catch (BookshopException e) {
             model.addAttribute(ERROR, e.getMessage());
             model.addAttribute(BOOK, bookDto);
-            model.addAttribute(AUTHORS, authors);
+            model.addAttribute(AUTHORS, authorService.getAllBookAuthors());
             return BOOK_ADD;
         }
-
     }
 
     @GetMapping("/book/{id}")
     public String bookDetails(@PathVariable Long id, Model model) {
-        int cartItemCount = cart.getItemCount();
-        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
-        List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-        model.addAttribute(AUTHORS, authors);
-        BookDto bookDto = bookService.getBookById(id);
-        model.addAttribute(BOOK, bookDto);
+        model.addAttribute(CART_ITEM_COUNT, cart.getItemCount());
+        model.addAttribute(AUTHORS, authorService.getAllBookAuthors());
+        model.addAttribute(BOOK, bookService.getBookById(id));
         return BOOK_INFO;
     }
 
@@ -143,13 +117,10 @@ public class BookController {
         return REDIRECT_BOOKS;
     }
 
-
     @GetMapping("/book/{id}/edit")
     public String showBookEditForm(@PathVariable(value = "id") Long id, Model model) {
-        BookDto bookDto = bookService.getBookById(id);
-        model.addAttribute(BOOK, bookDto);
-        List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-        model.addAttribute(AUTHORS, authors);
+        model.addAttribute(BOOK, bookService.getBookById(id));
+        model.addAttribute(AUTHORS, authorService.getAllBookAuthors());
         return BOOK_EDIT;
     }
 
@@ -161,11 +132,10 @@ public class BookController {
             bookService.updateBookWithImage(updatedBookDto, file);
             return REDIRECT_BOOKS;
 
-        } catch (BookValidationException e) {
+        } catch (BookshopException e) {
             model.addAttribute(ERROR, e.getMessage());
             model.addAttribute(BOOK, updatedBookDto);
-            List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-            model.addAttribute(AUTHORS, authors);
+            model.addAttribute(AUTHORS, authorService.getAllBookAuthors());
             return BOOK_EDIT;
         }
     }

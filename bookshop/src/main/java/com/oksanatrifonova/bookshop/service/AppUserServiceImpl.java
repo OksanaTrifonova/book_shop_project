@@ -4,10 +4,10 @@ import com.oksanatrifonova.bookshop.dto.AppUserDetails;
 import com.oksanatrifonova.bookshop.dto.AppUserDto;
 import com.oksanatrifonova.bookshop.entity.AppUser;
 import com.oksanatrifonova.bookshop.entity.Role;
-import com.oksanatrifonova.bookshop.exception.BookValidationException;
+import com.oksanatrifonova.bookshop.exception.BookshopException;
 import com.oksanatrifonova.bookshop.mapper.AppUserMapper;
 import com.oksanatrifonova.bookshop.repository.AppUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +20,7 @@ import java.util.List;
 
 
 @Service
+@AllArgsConstructor
 public class AppUserServiceImpl implements AppUserService {
 
     private static final String USER_NOT_FOUND_MSG = "User not found";
@@ -27,13 +28,8 @@ public class AppUserServiceImpl implements AppUserService {
     private static final String LAST_ADMIN_MSG = "Cannot delete the last active Admin user";
     private final AppUserRepository userRepository;
     private final AppUserMapper userMapper;
-    @Autowired
-    BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AppUserServiceImpl(AppUserRepository userRepository, AppUserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
 
     @Override
     public AppUser findUserByEmail(String email) {
@@ -42,7 +38,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     public AppUser findUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new BookValidationException(USER_NOT_FOUND_MSG));
+                .orElseThrow(() -> new BookshopException(USER_NOT_FOUND_MSG));
     }
 
     public void updateUserRole(Long id, String newRole) {
@@ -50,14 +46,14 @@ public class AppUserServiceImpl implements AppUserService {
             user.setRole(Role.valueOf(newRole));
             userRepository.save(user);
         }, () -> {
-            throw new BookValidationException(USER_NOT_FOUND_MSG);
+            throw new BookshopException(USER_NOT_FOUND_MSG);
         });
     }
 
 
     public void registerUser(AppUserDto userDto) {
         if (emailExists(userDto.getEmail())) {
-            throw new BookValidationException(SAME_EMAIL_MSG);
+            throw new BookshopException(SAME_EMAIL_MSG);
         }
         AppUser user = userMapper.mapToUser(userDto);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -78,7 +74,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     public void addUser(AppUserDto userDto) {
         if (emailExists(userDto.getEmail())) {
-            throw new BookValidationException(SAME_EMAIL_MSG);
+            throw new BookshopException(SAME_EMAIL_MSG);
         }
         AppUser user = userMapper.mapToUser(userDto);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -89,12 +85,12 @@ public class AppUserServiceImpl implements AppUserService {
 
     public void deleteUser(Long id) {
         AppUser user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND_MSG));
+                .orElseThrow(() -> new BookshopException(USER_NOT_FOUND_MSG));
 
         if (user.getRole().equals(Role.ADMIN)) {
             long adminCount = userRepository.countByRoleAndActive(Role.ADMIN, true);
             if (adminCount <= 1) {
-                throw new BookValidationException(LAST_ADMIN_MSG);
+                throw new BookshopException(LAST_ADMIN_MSG);
             }
         }
         user.setActive(false);
@@ -102,13 +98,11 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     public List<AppUserDto> findActiveUsersDto() {
-
         return userRepository.findByActive(true)
                 .stream()
                 .map(userMapper::mapToUserDto)
                 .toList();
     }
-
 
     public void updatePersonalDetails(AppUser existingUser, AppUserDto userDto) {
         AppUser user = userMapper.mapToUser(userDto);
@@ -144,5 +138,4 @@ public class AppUserServiceImpl implements AppUserService {
         AppUserDto userDto = userMapper.mapToUserDto(user);
         return new AppUserDetails(userDto);
     }
-
 }

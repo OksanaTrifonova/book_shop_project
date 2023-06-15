@@ -49,11 +49,11 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
-    private Set<BookAuthor> authors = new HashSet<>();
+    private Set<Author> authors = new HashSet<>();
     private boolean active;
 
 
-    public Book(String title, Set<BookAuthor> authors, BigDecimal price, String description, Category category) {
+    public Book(String title, Set<Author> authors, BigDecimal price, String description, Category category) {
         this.title = title;
         this.authors = authors;
         this.price = price;

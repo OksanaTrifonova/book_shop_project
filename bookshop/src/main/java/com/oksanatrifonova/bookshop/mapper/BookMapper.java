@@ -2,7 +2,7 @@ package com.oksanatrifonova.bookshop.mapper;
 
 import com.oksanatrifonova.bookshop.dto.BookDto;
 import com.oksanatrifonova.bookshop.entity.Book;
-import com.oksanatrifonova.bookshop.entity.BookAuthor;
+import com.oksanatrifonova.bookshop.entity.Author;
 import com.oksanatrifonova.bookshop.entity.Image;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class BookMapper {
 
         List<Long> authorIds = new ArrayList<>();
         List<String> authorNames = new ArrayList<>();
-        for (BookAuthor author : book.getAuthors()) {
+        for (Author author : book.getAuthors()) {
             authorIds.add(author.getId());
             authorNames.add(author.getName());
         }
@@ -46,9 +46,9 @@ public class BookMapper {
         book.setCategory(bookDto.getCategory());
         book.setDescription(bookDto.getDescription());
 
-        List<BookAuthor> authors = new ArrayList<>();
+        List<Author> authors = new ArrayList<>();
         for (Long authorId : bookDto.getAuthorIds()) {
-            BookAuthor author = new BookAuthor();
+            Author author = new Author();
             author.setId(authorId);
             authors.add(author);
         }

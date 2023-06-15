@@ -173,7 +173,7 @@
             </div>
         </div>
     </div>
-    <div sec:authorize="hasRole('ADMIN') or hasRole('MANAGER')" class="btn1-container-change">
+    <div th:if="${book.active}" sec:authorize="hasRole('ADMIN') or hasRole('MANAGER')" class="btn1-container-change">
         <a th:href="'/book/'+${book.id}+'/edit'" class="btn btn-edit">Edit</a>
         <form th:action="'/book/'+${book.id}+'/remove'" method="post">
             <button class="btn btn-delete" type="submit">Delete</button>

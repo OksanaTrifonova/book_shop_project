@@ -1,13 +1,13 @@
 package com.oksanatrifonova.bookshop.repository;
 
-import com.oksanatrifonova.bookshop.entity.BookAuthor;
+import com.oksanatrifonova.bookshop.entity.Author;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
+public interface AuthorRepository extends JpaRepository<Author, Long> {
 
-    List<BookAuthor> findByActive(boolean active);
+    List<Author> findByActive(boolean active);
 }

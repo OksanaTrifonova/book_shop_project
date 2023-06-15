@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-public class ImagesController {
-    private ImageService imagesService;
+public class ImageController {
+    private ImageService imageService;
 
     @GetMapping("/images/{id}")
     public ResponseEntity<InputStreamResource> getImageById(@PathVariable Long id) {
-        return imagesService.getImageById(id);
+        return imageService.getImageById(id);
     }
 }

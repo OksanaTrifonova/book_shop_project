@@ -1,7 +1,7 @@
 package com.oksanatrifonova.bookshop.repository;
 
 import com.oksanatrifonova.bookshop.entity.Book;
-import com.oksanatrifonova.bookshop.entity.BookAuthor;
+import com.oksanatrifonova.bookshop.entity.Author;
 import com.oksanatrifonova.bookshop.entity.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +16,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findBooksByCategoryAndActive(Category category, boolean active, Pageable pageable);
 
-    Page<Book> findBooksByAuthorsAndActive(BookAuthor author, boolean active, Pageable pageable);
-    List<Book> findAllByAuthors(BookAuthor author);
+    Page<Book> findBooksByAuthorsAndActive(Author author, boolean active, Pageable pageable);
+    List<Book> findAllByAuthors(Author author);
 
 }

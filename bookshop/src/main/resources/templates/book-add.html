@@ -60,7 +60,7 @@
 </head>
 <body>
 <div class="container mt-5">
-  <h1>Add book</h1>
+  <h1>Add a book</h1>
   <form th:object="${book}" action="/book/add" method="post" enctype="multipart/form-data">
 
     <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error-message"></span><br>
@@ -89,12 +89,11 @@
       <label for="category">Category:</label>
       <select id="category" name="category" required>
         <option value="DETECTIVE">Detective</option>
-        <option value=" CLASSICS">Classics</option>
+        <option value="CLASSICS">Classics</option>
         <option value="CHILDREN">Children</option>
         <option value="FANTASY">Fantasy</option>
         <option value="ROMANCE">Romance</option>
         <option value="THRILLER">Thriller</option>
-        <option value="SCIENCE_FICTION">Science_fiction</option>
 
       </select><br><br><br>
     </div>
@@ -103,7 +102,7 @@
     <input type="hidden" id="authorId" name="authorId" th:value="${selectedAuthorId}" />
 
     <button type="submit" class="btn btn-success">Add the book</button>
-    <a href="/" class="back-link">Back to Home</a>
+    <a href="/books" class="back-link">Back to books</a>
   </form>
 
 </div>

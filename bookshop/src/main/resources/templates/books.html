@@ -219,9 +219,11 @@
         <button type="submit">Filter</button>
     </form><br><br>
     <ul>
-        <li><a th:href="@{/books}">All CATEGORIES</a></li>
+        <li><a th:href="@{/books}">All Categories</a></li>
         <li th:each="category : ${categories}">
-            <a th:href="@{/books/category/{category}(category=${category})}" th:text="${category}"></a>
+            <a th:href="@{/books/category/{category}(category=${category.toString().toUpperCase()})}" th:text="${category}"></a>
+
+
         </li>
     </ul>
     <div sec:authorize="hasRole('ADMIN') or hasRole('MANAGER')">

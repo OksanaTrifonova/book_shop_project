@@ -1,14 +1,14 @@
 package com.oksanatrifonova.bookshop.mapper;
 
-import com.oksanatrifonova.bookshop.dto.BookAuthorDto;
-import com.oksanatrifonova.bookshop.entity.BookAuthor;
+import com.oksanatrifonova.bookshop.dto.AuthorDto;
+import com.oksanatrifonova.bookshop.entity.Author;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BookAuthorMapper {
+public class AuthorMapper {
 
-    public BookAuthorDto toDto(BookAuthor bookAuthor) {
-        BookAuthorDto dto = new BookAuthorDto();
+    public AuthorDto toDto(Author bookAuthor) {
+        AuthorDto dto = new AuthorDto();
         dto.setId(bookAuthor.getId());
         dto.setName(bookAuthor.getName());
         dto.setBirthYear(formatYear(bookAuthor.getBirthYear()));

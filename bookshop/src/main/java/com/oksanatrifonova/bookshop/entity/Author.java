@@ -21,7 +21,7 @@ import java.util.Set;
 @Setter
 @Table(name = "author")
 @Entity
-public class BookAuthor {
+public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -35,7 +35,7 @@ public class BookAuthor {
     private Set<Book> books = new HashSet<>();
     private boolean active;
 
-    public BookAuthor(String name, Integer birthYear, Integer deathYear) {
+    public Author(String name, Integer birthYear, Integer deathYear) {
         this.name = name;
         this.birthYear = birthYear;
         this.deathYear = deathYear;

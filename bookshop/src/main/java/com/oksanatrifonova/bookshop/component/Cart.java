@@ -20,19 +20,15 @@ public class Cart {
     private final BookService bookService;
     private final List<ItemDto> itemDtoList;
 
-
     public List<ItemDto> getItemDtoList() {
         return itemDtoList;
     }
-
     public void removeAllItems() {
         itemDtoList.clear();
     }
-
     public void removeItemById(Long id) {
         itemDtoList.removeIf(item -> Objects.equals(item.getBook().getId(), id));
     }
-
     public void addItemToCart(BookDto bookDto, int quantity, BigDecimal price) {
         Optional<ItemDto> existingItem = itemDtoList.stream()
                 .filter(item -> item.getBook().getId().equals(bookDto.getId()))
@@ -45,7 +41,6 @@ public class Cart {
             itemDtoList.add(new ItemDto(book, quantity, price));
         }
     }
-
     public void addToCart(Long bookId) {
         BookDto book = bookService.getBookById(bookId);
         if (book != null) {
@@ -53,25 +48,20 @@ public class Cart {
             calculateTotalAmount();
         }
     }
-
     public void update(Long id, int quantity) {
         Optional<ItemDto> optionalItem = itemDtoList.stream()
                 .filter(item -> item.getBook().getId().equals(id))
                 .findFirst();
         optionalItem.ifPresent(item -> item.setQuantity(quantity));
     }
-
     public BigDecimal calculateTotalAmount() {
         return itemDtoList.stream()
                 .map(item -> item.getBook().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
     public int getItemCount() {
         return itemDtoList.stream()
                 .mapToInt(ItemDto::getQuantity)
                 .sum();
     }
-
-
 }

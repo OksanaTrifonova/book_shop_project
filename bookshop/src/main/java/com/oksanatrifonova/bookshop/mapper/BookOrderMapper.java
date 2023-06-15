@@ -1,7 +1,7 @@
 package com.oksanatrifonova.bookshop.mapper;
 
-import com.oksanatrifonova.bookshop.dto.BookOrderDto;
-import com.oksanatrifonova.bookshop.entity.BookOrder;
+import com.oksanatrifonova.bookshop.dto.OrderDto;
+import com.oksanatrifonova.bookshop.entity.Order;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class BookOrderMapper {
     private final ItemMapper itemMapper;
 
-    public BookOrderDto convertToDto(BookOrder order) {
-        BookOrderDto orderDto = new BookOrderDto();
+    public OrderDto convertToDto(Order order) {
+        OrderDto orderDto = new OrderDto();
         orderDto.setId(order.getId());
         orderDto.setItems(itemMapper.convertToDtoList(order.getItems()));
         orderDto.setTotalAmount(order.getTotalAmount());

@@ -1,10 +1,6 @@
 package com.oksanatrifonova.bookshop.controller;
 
-import com.oksanatrifonova.bookshop.dto.AppUserDto;
-import com.oksanatrifonova.bookshop.dto.BookOrderDto;
-import com.oksanatrifonova.bookshop.entity.AppUser;
-import com.oksanatrifonova.bookshop.entity.BookOrder;
-import com.oksanatrifonova.bookshop.exception.BookValidationException;
+import com.oksanatrifonova.bookshop.exception.BookshopException;
 import com.oksanatrifonova.bookshop.mapper.AppUserMapper;
 import com.oksanatrifonova.bookshop.service.AppUserServiceImpl;
 import com.oksanatrifonova.bookshop.service.OrderService;
@@ -16,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.security.Principal;
-import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -42,36 +37,25 @@ public class OrderController {
                 model.addAttribute(MESSAGE, "You must be logged in to place an order");
                 return LOGIN;
             }
-            String userName = principal.getName();
-            AppUser existingUser = userService.findUserByEmail(userName);
-            BookOrder order = orderService.placeOrder(existingUser);
-            model.addAttribute(ORDER, order);
+            model.addAttribute(ORDER, orderService.placeOrder(userService.findUserByEmail(principal.getName())));
             return ORDER_CONFIRMATION;
-        } catch (BookValidationException ex) {
+        } catch (BookshopException ex) {
             model.addAttribute(MESSAGE, ex.getMessage());
-            AppUser user = userService.getCurrentUser();
-            AppUserDto userDto = userMapper.mapToUserDto(user);
-            model.addAttribute(PERSONAL_DETAILS, userDto);
+            model.addAttribute(PERSONAL_DETAILS, userMapper.mapToUserDto(userService.getCurrentUser()));
             return DETAILS_USER;
         }
-
     }
 
     @GetMapping("/account/orders")
     public String viewOrders(Model model, Principal principal) {
-        String userName = principal.getName();
-        AppUser user = userService.findUserByEmail(userName);
-        List<BookOrderDto> orderDtoList = orderService.getOrdersForUser(user);
-        model.addAttribute(ORDER_DETAILS, orderDtoList);
+        model.addAttribute(ORDER_DETAILS, orderService.getOrdersForUser(userService.findUserByEmail(principal.getName())));
         return ORDER_LIST;
     }
 
     @GetMapping("/account/order/{orderId}")
     public String viewOrderDetails(@PathVariable("orderId") Long orderId, Model model) {
-        BookOrderDto orderDto = orderService.getOrderById(orderId);
-        model.addAttribute(ORDER, orderDto);
+        model.addAttribute(ORDER, orderService.getOrderById(orderId));
         return ORDER_LIST_DETAILS;
     }
-
 }
 

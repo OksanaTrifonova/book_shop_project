@@ -1,13 +1,13 @@
 package com.oksanatrifonova.bookshop.service;
 
 import com.oksanatrifonova.bookshop.dto.BookDto;
+import com.oksanatrifonova.bookshop.entity.Author;
 import com.oksanatrifonova.bookshop.entity.Book;
-import com.oksanatrifonova.bookshop.entity.BookAuthor;
 import com.oksanatrifonova.bookshop.entity.Category;
 import com.oksanatrifonova.bookshop.entity.Image;
-import com.oksanatrifonova.bookshop.exception.BookValidationException;
+import com.oksanatrifonova.bookshop.exception.BookshopException;
 import com.oksanatrifonova.bookshop.mapper.BookMapper;
-import com.oksanatrifonova.bookshop.repository.BookAuthorRepository;
+import com.oksanatrifonova.bookshop.repository.AuthorRepository;
 import com.oksanatrifonova.bookshop.repository.BookRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class BookService {
     private static final String DESCRIPTION_MSG = "Description is required";
 
     private final BookRepository bookRepository;
-    private final BookAuthorRepository bookAuthorRepository;
+    private final AuthorRepository bookAuthorRepository;
     private final BookMapper bookMapper;
 
     public Page<BookDto> getBooksByFilter(String filterButton, Long authorId, Pageable pageable) {
@@ -59,8 +60,8 @@ public class BookService {
     }
 
     public List<BookDto> findBooksByAuthorFor(Long authorId) {
-        BookAuthor author = bookAuthorRepository.findById(authorId)
-                .orElseThrow(() -> new BookValidationException(INVALID_ID_MSG + authorId));
+        Author author = bookAuthorRepository.findById(authorId)
+                .orElseThrow(() -> new BookshopException(INVALID_ID_MSG + authorId));
 
         List<Book> books = bookRepository.findAllByAuthors(author);
         return books.stream()
@@ -68,23 +69,26 @@ public class BookService {
                 .toList();
     }
 
+    public List<String> getAllCategoryNames() {
+        return Arrays.stream(Category.values())
+                .map(Category::toString)
+                .toList();
+    }
 
     public Page<BookDto> findBooksByCategory(Category category, Pageable pageable) {
         Page<Book> bookPage = bookRepository.findBooksByCategoryAndActive(category, true, pageable);
         return bookPage.map(bookMapper::toDto);
     }
 
-
-    public Set<BookAuthor> mapAuthorIdsToAuthors(List<Long> authorIds) {
+    public Set<Author> mapAuthorIdsToAuthors(List<Long> authorIds) {
         return authorIds.stream()
                 .map(authorId -> bookAuthorRepository.findById(authorId)
-                        .orElseThrow(() -> new BookValidationException(INVALID_ID_MSG + authorId)))
+                        .orElseThrow(() -> new BookshopException(INVALID_ID_MSG + authorId)))
                 .collect(Collectors.toSet());
     }
 
-
     @Transactional
-    public void saveBook(BookDto bookDto, MultipartFile file) throws BookValidationException, IOException {
+    public void saveBook(BookDto bookDto, MultipartFile file) throws BookshopException, IOException {
         validateBook(bookDto);
         Book book = bookMapper.toEntity(bookDto);
         book.setActive(true);
@@ -92,7 +96,7 @@ public class BookService {
         Image image;
         if (!file.isEmpty()) {
             if (file.getSize() >= 65535) {
-                throw new BookValidationException(IMAGE_SIZE_MSG);
+                throw new BookshopException(IMAGE_SIZE_MSG);
             }
             image = toImageEntity(file);
             book.addImageToBook(image);
@@ -104,20 +108,19 @@ public class BookService {
 
     private void validateBook(BookDto bookDto) {
         if (bookDto.getTitle() == null || bookDto.getTitle().isEmpty()) {
-            throw new BookValidationException(TITLE_MSG);
+            throw new BookshopException(TITLE_MSG);
         }
         if (bookDto.getPrice() == null) {
-            throw new BookValidationException(PRICE_MSG);
+            throw new BookshopException(PRICE_MSG);
         }
         if (bookDto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BookValidationException(PRICE_VALIDATION_MSG);
+            throw new BookshopException(PRICE_VALIDATION_MSG);
         }
 
         if (bookDto.getDescription() == null || bookDto.getDescription().isEmpty()) {
-            throw new BookValidationException(DESCRIPTION_MSG);
+            throw new BookshopException(DESCRIPTION_MSG);
         }
     }
-
 
     public Image toImageEntity(MultipartFile file) throws IOException {
         return new Image(
@@ -147,7 +150,7 @@ public class BookService {
                         book.setImages(updatedImage);
                     }
                 } else {
-                    throw new IllegalArgumentException(IMAGE_SIZE_MSG);
+                    throw new BookshopException(IMAGE_SIZE_MSG);
                 }
             }
             book.setTitle(updatedBookDto.getTitle());
@@ -174,7 +177,6 @@ public class BookService {
             book.setActive(true);
             bookRepository.save(book);
         }
-
     }
 
     public BookDto getBookById(Long id) {

@@ -23,32 +23,25 @@ public class MainController {
 
     @GetMapping("/")
     public String viewHome(Model model) {
-        int cartItemCount = cart.getItemCount();
-        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
+        model.addAttribute(CART_ITEM_COUNT, cart.getItemCount());
         return HOME;
     }
 
     @GetMapping("/login")
     public String viewLogin(Principal principal, Model model) {
-        int cartItemCount = cart.getItemCount();
-        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
-        if (principal != null) {
-            return REDIRECT;
-        }
-        return LOGIN;
+        model.addAttribute(CART_ITEM_COUNT, cart.getItemCount());
+        return principal != null ? REDIRECT : LOGIN;
     }
 
-
     @GetMapping("/contacts")
-    public String viewContacts() {
+    public String viewContacts(Model model) {
+        model.addAttribute(CART_ITEM_COUNT, cart.getItemCount());
         return CONTACTS;
     }
 
     @GetMapping("/account")
     public String viewAccount(Model model) {
-        int cartItemCount = cart.getItemCount();
-        model.addAttribute(CART_ITEM_COUNT, cartItemCount);
+        model.addAttribute(CART_ITEM_COUNT, cart.getItemCount());
         return ACCOUNT;
     }
-
 }

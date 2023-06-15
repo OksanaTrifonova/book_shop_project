@@ -1,8 +1,7 @@
 package com.oksanatrifonova.bookshop.controller;
 
-import com.oksanatrifonova.bookshop.dto.BookAuthorDto;
-import com.oksanatrifonova.bookshop.dto.BookDto;
-import com.oksanatrifonova.bookshop.exception.BookValidationException;
+import com.oksanatrifonova.bookshop.dto.AuthorDto;
+import com.oksanatrifonova.bookshop.exception.BookshopException;
 import com.oksanatrifonova.bookshop.service.AuthorService;
 import com.oksanatrifonova.bookshop.service.BookService;
 import lombok.AllArgsConstructor;
@@ -14,13 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 @Controller
 @AllArgsConstructor
 @RequestMapping("/authors")
 public class AuthorController {
-
     private static final String REDIRECT_TO_AUTHORS = "redirect:/authors";
     private static final String AUTHOR_ATTRIBUTE = "author";
     private static final String AUTHORS_TEMPLATE = "authors";
@@ -29,67 +25,58 @@ public class AuthorController {
     private static final String AUTHOR_EDIT_TEMPLATE = "author-edit";
     private static final String AUTHOR_ADD = "author-add";
     private static final String BOOKS = "books";
-    private final AuthorService bookAuthorService;
+    private final AuthorService authorService;
     private final BookService bookService;
-
 
     @GetMapping
     public String getAllAuthors(Model model) {
-
-        List<BookAuthorDto> authors = bookAuthorService.getAllBookAuthors();
-        model.addAttribute(AUTHORS_TEMPLATE, authors);
-        model.addAttribute(AUTHOR_ATTRIBUTE, new BookAuthorDto());
+        model.addAttribute(AUTHORS_TEMPLATE, authorService.getAllBookAuthors());
+        model.addAttribute(AUTHOR_ATTRIBUTE, new AuthorDto());
         return AUTHORS_TEMPLATE;
     }
 
     @GetMapping("/add")
-    public String viewUserAddForm(Model model) {
+    public String viewAuthorAddForm(Model model) {
         if (model.containsAttribute(ERROR)) {
-            String error = (String) model.getAttribute(ERROR);
-            model.addAttribute(ERROR, error);
+            model.addAttribute(ERROR, model.getAttribute(ERROR));
         }
-        BookAuthorDto authorDto = new BookAuthorDto();
-        model.addAttribute(AUTHOR_ATTRIBUTE, authorDto);
+        model.addAttribute(AUTHOR_ATTRIBUTE, new AuthorDto());
         return AUTHOR_ADD;
     }
 
     @GetMapping("/{id}/books")
     public String showAllAuthorsBooks(@PathVariable Long id, Model model) {
-        BookAuthorDto author = bookAuthorService.getAuthorById(id);
-        model.addAttribute(AUTHOR_ATTRIBUTE, author);
-        List<BookDto> books = bookService.findBooksByAuthorFor(author.getId());
-        model.addAttribute(AUTHOR_ATTRIBUTE, author);
-        model.addAttribute(BOOKS, books);
+        model.addAttribute(AUTHOR_ATTRIBUTE, authorService.getAuthorById(id));
+        model.addAttribute(BOOKS, bookService.findBooksByAuthorFor(authorService.getAuthorById(id).getId()));
         return AUTHORS_BOOK;
     }
 
     @PostMapping("/add")
-    public String addAuthor(@ModelAttribute(AUTHOR_ATTRIBUTE) BookAuthorDto author,
+    public String addAuthor(@ModelAttribute(AUTHOR_ATTRIBUTE) AuthorDto author,
                             Model model) {
         try {
-            bookAuthorService.createBookAuthor(author);
+            authorService.addAuthor(author);
             return REDIRECT_TO_AUTHORS;
-        } catch (BookValidationException e) {
+        } catch (BookshopException e) {
             model.addAttribute(ERROR, e.getMessage());
             return AUTHOR_ADD;
         }
     }
 
-
     @PostMapping("/{authorId}/delete")
     public String deleteAuthor(@PathVariable Long authorId) {
-        bookAuthorService.deleteBookAuthor(authorId);
+        authorService.deleteAuthor(authorId);
         return REDIRECT_TO_AUTHORS;
     }
 
     @PostMapping("/{authorId}/edit")
     public String editAuthor(@PathVariable Long authorId,
-                             @ModelAttribute(AUTHOR_ATTRIBUTE) BookAuthorDto author,
+                             @ModelAttribute(AUTHOR_ATTRIBUTE) AuthorDto authorDto,
                              Model model) {
         try {
-            bookAuthorService.editBookAuthor(authorId, author);
+            authorService.editAuthor(authorId, authorDto);
             return REDIRECT_TO_AUTHORS;
-        } catch (BookValidationException e) {
+        } catch (BookshopException e) {
             model.addAttribute(ERROR, e.getMessage());
             return AUTHORS_TEMPLATE;
         }
@@ -97,10 +84,8 @@ public class AuthorController {
 
     @GetMapping("/{authorId}/edit")
     public String showEditAuthorForm(@PathVariable Long authorId, Model model) {
-        BookAuthorDto author = bookAuthorService.getAuthorById(authorId);
-        model.addAttribute(AUTHOR_ATTRIBUTE, author);
+        model.addAttribute(AUTHOR_ATTRIBUTE, authorService.getAuthorById(authorId));
         return AUTHOR_EDIT_TEMPLATE;
     }
-
 }
 

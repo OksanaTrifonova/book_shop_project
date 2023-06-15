@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookAuthorDto {
+public class AuthorDto {
     private Long id;
     private String name;
     private String birthYear;
