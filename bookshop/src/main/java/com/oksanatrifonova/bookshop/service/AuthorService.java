@@ -33,7 +33,7 @@ public class AuthorService {
 
     public void editAuthor(Long authorId, AuthorDto authorDto) {
         Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new IllegalArgumentException(AUTHOR_NOT_FOUND_MSG));
+                .orElseThrow(() -> new BookshopException(AUTHOR_NOT_FOUND_MSG));
         Integer birthYear = parseYear(authorDto.getBirthYear());
         Integer deathYear = parseYear(authorDto.getDeathYear());
         validateBirthAndDeathYears(birthYear, deathYear);
@@ -71,15 +71,15 @@ public class AuthorService {
     }
 
     public void deleteAuthor(Long id) {
-        Author bookAuthor = authorRepository.findById(id)
+        Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new BookshopException(AUTHOR_NOT_FOUND_MSG));
-        bookAuthor.setActive(false);
-        authorRepository.save(bookAuthor);
+        author.setActive(false);
+        authorRepository.save(author);
     }
 
     public List<AuthorDto> getAllBookAuthors() {
-        List<Author> bookAuthors = authorRepository.findByActive(true);
-        return bookAuthors.stream()
+        List<Author> authors = authorRepository.findByActive(true);
+        return authors.stream()
                 .map(authorMapper::toDto)
                 .toList();
     }

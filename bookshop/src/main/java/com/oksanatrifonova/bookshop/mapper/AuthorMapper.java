@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthorMapper {
 
-    public AuthorDto toDto(Author bookAuthor) {
+    public AuthorDto toDto(Author author) {
         AuthorDto dto = new AuthorDto();
-        dto.setId(bookAuthor.getId());
-        dto.setName(bookAuthor.getName());
-        dto.setBirthYear(formatYear(bookAuthor.getBirthYear()));
-        dto.setDeathYear(formatYear(bookAuthor.getDeathYear()));
-        dto.setActive(bookAuthor.isActive());
+        dto.setId(author.getId());
+        dto.setName(author.getName());
+        dto.setBirthYear(formatYear(author.getBirthYear()));
+        dto.setDeathYear(formatYear(author.getDeathYear()));
+        dto.setActive(author.isActive());
         return dto;
     }
     private String formatYear(Integer year) {

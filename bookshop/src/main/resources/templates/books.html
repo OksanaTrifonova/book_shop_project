@@ -94,6 +94,21 @@
             vertical-align: top;
         }
 
+    .book {
+        position: relative;
+        background-color: #f0f0f0;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .book .btn-container {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
+
         .btn-container {
             display: flex;
             justify-content: center;
@@ -213,7 +228,7 @@
     <form th:action="@{/books}" method="get">
         <label for="author">Select author:</label>
         <select id="author" name="authorId">
-            <option value="">All AUTHORS</option>
+            <option value="">All authors</option>
             <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
         </select>
         <button type="submit">Filter</button>
@@ -245,8 +260,8 @@
                     <span th:text="${authorName}"></span>
                     <span th:if="${!iterStat.last}">, </span>
                 </span>
-        </p>
-        <p>Price: $<span th:text="${book.price}"></span></p>
+        </p><br>
+        <p>Price: $<span th:text="${book.price}"></span></p><br><br>
         <div class="btn-container" sec:authorize="!hasRole('ADMIN')">
             <a th:href="'/book/' + ${book.id} + '/cart'" class="btn btn-warning">Add to cart</a>
         </div>
