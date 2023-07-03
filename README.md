@@ -1,1 +1,2 @@
-# book_shop_project
+# Book store
+Used Technologies:
